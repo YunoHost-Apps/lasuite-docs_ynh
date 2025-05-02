@@ -1,0 +1,46 @@
+#!/bin/bash
+
+## this script is only run if actual change to domain/path is detected, if you're here either $domain or $path changed
+## new location is available via $domain and $path (or $new_domain and $new_path variables if you want to be explicit)
+## old values are available via, you guessed it, $old_domain and $old_path
+
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# STOP SYSTEMD SERVICE
+#=================================================
+ynh_script_progression "Stopping $app's systemd service..."
+
+ynh_systemctl --service="$app" --action="stop"
+
+#=================================================
+# MODIFY URL IN NGINX CONF
+#=================================================
+ynh_script_progression "Updating NGINX web server configuration..."
+
+# this will most likely adjust NGINX config correctly
+ynh_config_change_url_nginx
+
+#=================================================
+# SPECIFIC MODIFICATIONS
+#=================================================
+
+## do any changes to files that reference specific installation domain/path, i.e. regenerate configs etc
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression "Starting $app's systemd service..."
+
+ynh_systemctl --service="$app" --action="start"
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression "Change of URL completed for $app"
