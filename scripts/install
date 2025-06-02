@@ -34,11 +34,9 @@ source /usr/share/yunohost/helpers
 # (or remove this section entirely if not relevant for you)
 redis_db=$(ynh_redis_get_free_db)
 celery_redis_db=$(ynh_redis_get_free_db)
-livekit_secret_key=$(ynh_string_random -l 32)
 django_secret_key=$(ynh_string_random -l 32)
 ynh_app_setting_set --key=redis_db --value=$redis_db
 ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
-ynh_app_setting_set --key=livekit_secret_key --value=$livekit_secret_key
 ynh_app_setting_set --key=django_secret_key --value=$django_secret_key
 
 #=================================================
@@ -70,7 +68,6 @@ ynh_nodejs_install
 ynh_script_progression "Setting up source files..."
 
 ynh_setup_source --dest_dir="$install_dir"
-ynh_setup_source --dest_dir="$install_dir/livekit" --source_id="livekit"
 
 ynh_exec_as_app mkdir -p "$install_dir/_build/venv"
 ynh_exec_as_app mkdir -p "$install_dir/_build/frontend"
@@ -118,14 +115,6 @@ ynh_config_add --template="env" --destination="$install_dir/.env"
 chmod 400 "$install_dir/.env"
 chown "$app:$app" "$install_dir/.env"
 
-ynh_config_add --template="livekit.yaml" --destination="$install_dir/livekit/livekit.yaml"
-chmod 400 "$install_dir/livekit/livekit.yaml"
-chown "$app:$app" "$install_dir/livekit/livekit.yaml"
-
-ynh_config_add --template="meet.py" --destination="$install_dir/meet-conf.py"
-chmod 400 "$install_dir/meet-conf.py"
-chown "$app:$app" "$install_dir/meet-conf.py"
-
 #=================================================
 # SYSTEM CONFIGURATION
 #=================================================
@@ -135,10 +124,8 @@ ynh_config_add_nginx
 
 # Create a dedicated systemd config
 ynh_config_add_systemd
-ynh_config_add_systemd --service="${app}-livekit" --template="systemd-livekit.service"
 
-yunohost service add "$app" --description="Simple and Secure Video Conferencing" --log="/var/log/$app/$app.log"
-yunohost service add "$app-livekit" --description="Livekit for $app" --log="/var/log/$app/$app-livekit.log" --needs_exposed_ports "$port_tcp" "$port_livekit"
+yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
 
 # Use logrotate to manage application logfile(s)
 ynh_config_add_logrotate
@@ -150,7 +137,6 @@ ynh_script_progression "Starting $app's systemd service..."
 
 # Start a systemd service
 ynh_systemctl --service="$app" --action="start"
-ynh_systemctl --service="${app}-livekit" --action="start"
 
 #=================================================
 # END OF SCRIPT
