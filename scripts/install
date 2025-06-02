@@ -60,7 +60,6 @@ ynh_exec_as_app mkdir -p "$install_dir/_build/data/static"
 
 pushd "$install_dir/_build/venv"
   ynh_exec_as_app python -m venv .
-  ynh_exec_as_app source venv/bin/activate
   ynh_hide_warnings ynh_exec_as_app ./bin/pip install "$install_dir/src/backend"
   ynh_hide_warnings ynh_exec_as_app ./bin/pip freeze > requirements.txt
   ynh_hide_warnings ynh_exec_as_app ./bin/pip install -r requirements.txt
