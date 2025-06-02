@@ -81,12 +81,9 @@ popd
 
 pushd "$install_dir/src/frontend"
   ynh_hide_warnings ynh_exec_as_app yarn install
-  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn app:build
-  ynh_hide_warnings ynh_exec_as_app yarn app:start
   # FIXME: if needed: NEXT_PUBLIC_API_ORIGIN="https://${domain}". Otherwise remove this comment
-  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production npm run build -- --outDir="$install_dir/_build/frontend" --emptyOutDir
+  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn app:build
 popd
-
 
 chown -R "$app:www-data" "$install_dir"
 
