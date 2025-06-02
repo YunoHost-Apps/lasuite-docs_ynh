@@ -81,9 +81,10 @@ popd
 
 pushd "$install_dir/src/frontend"
   ynh_hide_warnings ynh_exec_as_app yarn install
-  # FIXME: if needed: NEXT_PUBLIC_API_ORIGIN="https://${domain}". Otherwise remove this comment
   ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn app:build
+  mv ./apps/impress/out "$install_dir/_build/frontend"
 popd
+
 
 chown -R "$app:www-data" "$install_dir"
 
