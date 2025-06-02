@@ -6,7 +6,6 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
-source ynh_python_install
 
 ### Install parameters are automatically saved as settings
 ###
@@ -59,16 +58,11 @@ ynh_exec_as_app mkdir -p "$install_dir/_build/venv"
 ynh_exec_as_app mkdir -p "$install_dir/_build/frontend"
 ynh_exec_as_app mkdir -p "$install_dir/_build/data/static"
 
-ynh_python_install
-
 pushd "$install_dir/_build/venv"
   ynh_exec_as_app python3.11 -m venv .
-  set -a
-  source ./bin/activate
-  set +a
-  ynh_hide_warnings ynh_exec_as_app pip install "$install_dir/src/backend"
-  ynh_hide_warnings ynh_exec_as_app pip freeze > requirements.txt
-  ynh_hide_warnings ynh_exec_as_app pip install -r requirements.txt
+  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install "$install_dir/src/backend"
+  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 freeze > requirements.txt
+  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install -r requirements.txt
   ynh_exec_as_app python manage.py migrate
 popd
 
