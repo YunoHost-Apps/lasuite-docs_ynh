@@ -61,9 +61,9 @@ ynh_exec_as_app mkdir -p "$install_dir/_build/data/static"
 pushd "$install_dir/_build/venv"
   ynh_exec_as_app python3.11 -m venv .
   source ./bin/activate 
-  ynh_hide_warnings ynh_exec_as_app ./bin/pip install "$install_dir/src/backend"
-  ynh_hide_warnings ynh_exec_as_app ./bin/pip freeze > requirements.txt
-  ynh_hide_warnings ynh_exec_as_app ./bin/pip install -r requirements.txt
+  ynh_hide_warnings ynh_exec_as_app pip install "$install_dir/src/backend"
+  ynh_hide_warnings ynh_exec_as_app pip freeze > requirements.txt
+  ynh_hide_warnings ynh_exec_as_app pip install -r requirements.txt
   ynh_exec_as_app python manage.py migrate
 popd
 
