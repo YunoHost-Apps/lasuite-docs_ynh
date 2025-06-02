@@ -41,28 +41,25 @@ setup_dex() {
 	dex_domain="$(ynh_app_setting_get --app $dex --key domain)"
 	dex_path="$(ynh_app_setting_get --app $dex --key path)"
 	oidc_callback="https://$domain${path%/}/oidc/callback"
+  
+  # Create Dex URIs
+  dex_domain_path="${dex_domain}${dex_path}"
 
-	# # If the API key needs updating (exclude Headscale requirement in CI context)
-	# if [[ -z "${api_key:-}" || "$(date +%s)" -gt "${api_key_expires:-0}" ]]; then
-	# 	if [ ! ynh_in_ci_tests ]; then
-	# 		systemctl is-active --quiet headscale || systemctl restart headscale --quiet
-	# 		api_key="$(yunohost app shell headscale <<< './headscale apikeys create --expiration 999d')"
-	# 	else
-	# 		api_key=""
-	# 	fi
-	# 	# 86227200 is 998 days
-	# 	api_key_expires="$(( $(date +%s) + 86227200 ))"
-	# 	# ISO format for better internationalization
-	# 	api_key_expires_date="$(date -d @$api_key_expires -I)"
-	# fi
+  # Doc for the trick below:
+  # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
+  dex_domain_path_no_trailing_slash="${dex_domain_path%/}"
+
+  dex_auth_uri="https://${dex_domain_path_no_trailing_slash}/auth"
+  dex_token_uri="https://${dex_domain_path_no_trailing_slash}/token"
+  dex_keys_uri="https://${dex_domain_path_no_trailing_slash}/keys"
+  dex_user_uri="https://${dex_domain_path_no_trailing_slash}/userinfo"
 
 	# Store the variables
 	ynh_app_setting_set         --key=dex_install_dir       --value="$dex_install_dir"
-	ynh_app_setting_set         --key=dex_domain            --value="$dex_domain"
-	ynh_app_setting_set         --key=dex_path              --value="$dex_path"
-	# ynh_app_setting_set         --key=api_key               --value="$api_key"
-	# ynh_app_setting_set         --key=api_key_expires       --value="$api_key_expires"
-	# ynh_app_setting_set         --key=api_key_expires_date  --value="$api_key_expires_date"
+  ynh_app_setting_set         --key=dex_user_uri          --value="$dex_user_uri"
+  ynh_app_setting_set         --key=dex_auth_uri          --value="$dex_auth_uri"
+  ynh_app_setting_set         --key=dex_token_uri         --value="$dex_token_uri"
+  ynh_app_setting_set         --key=dex_user_uri          --value="$dex_user_uri"
 	ynh_app_setting_set_default --key=oidc_name             --value="$app"
 	ynh_app_setting_set         --key=oidc_callback         --value="$oidc_callback"
 	ynh_app_setting_set_default --key=oidc_secret           --value="$(ynh_string_random --length=32 --filter='A-F0-9')"
