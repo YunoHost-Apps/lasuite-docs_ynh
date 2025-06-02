@@ -63,7 +63,6 @@ pushd "$install_dir/_build/venv"
   ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install "$install_dir/src/backend"
   ynh_hide_warnings ynh_exec_as_app ./bin/pip3 freeze > requirements.txt
   ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install -r requirements.txt
-  ynh_exec_as_app python manage.py migrate
 popd
 
 pushd "$install_dir/src/backend"
