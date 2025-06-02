@@ -7,24 +7,10 @@
 source _common.sh
 source /usr/share/yunohost/helpers
 
-### Install parameters are automatically saved as settings
-###
-### Settings are automatically loaded as bash variables
-### in every app script context, therefore typically these will exist:
-### - $domain
-### - $path
-### - $language
-### ... etc
-###
-### Resources defined in the manifest are provisioned prior to this script
-### and corresponding settings are also available, such as:
-### - $install_dir
-### - $port
-### - $db_name
-### ...
-###
-### $app is the app id (i.e. 'example' for first install,
-### or 'example__2', '__3'... for multi-instance installs)
+#=================================================
+# SETUP DEX FOR OIDC
+#=================================================
+setup_dex
 
 #=================================================
 # INITIALIZE AND STORE SETTINGS
