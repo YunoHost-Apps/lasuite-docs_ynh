@@ -1,0 +1,230 @@
+#!/usr/bin/env bash
+#
+# Copyright (c) 2024 YunoHost Contributors
+#
+# This file is part of YunoHost (see https://yunohost.org)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+readonly PYENV_INSTALL_DIR="/opt/pyenv"
+
+# PYENV_ROOT is the directory of pyenv, it needs to be loaded as a environment variable.
+export PYENV_ROOT="$PYENV_INSTALL_DIR"
+export pyenv_root="$PYENV_INSTALL_DIR"
+
+_ynh_load_python_in_path_and_other_tweaks() {
+
+    # Get the absolute path of this version of Python
+    python_dir="$PYENV_INSTALL_DIR/versions/$python_version/bin"
+
+    # Load the path of this version of Python in $PATH
+    if [[ :$PATH: != *":$python_dir"* ]]; then
+        path_with_python="$python_dir:$PATH"
+        PATH_with_python="$python_dir:$PATH"
+    fi
+
+    # Export PATH such that it's available through sudo -E / ynh_exec_as $app
+    #export PATH
+
+    # This is in full lowercase such that it gets replaced in templates
+    #path_with_python="$PATH"
+    #PATH_with_python="$PATH"
+
+    # Sets the local application-specific Python version
+    pushd ${install_dir}
+    $PYENV_INSTALL_DIR/bin/pyenv local $python_version
+    popd
+}
+
+# Install a specific version of Python using pyenv
+#
+# The installed version is defined by `$python_version` which should be defined as global prior to calling this helper
+#
+# usage: ynh_python_install
+#
+# The helper adds the appropriate, specific version of python to the `$PATH` variable (which
+# is preserved when calling ynh_exec_as_app). Also defines:
+# - `$path_with_python` to be used in the systemd config (`Environment="PATH=__PATH_WITH_PYTHON__"`)
+# - `$python_dir`, the directory containing the specific version of python, which may be used in the systemd config too (e.g. `ExecStart=__PYTHON_DIR__/python foo bar`)
+#
+# This helper also creates a /etc/profile.d/pyenv.sh that configures PATH environment for pyenv
+ynh_python_install() {
+
+    [[ -n "${python_version:-}" ]] || ynh_die "\$python_version should be defined prior to calling ynh_python_install"
+
+    # Load pyenv path in PATH
+    local CLEAR_PATH="$PYENV_INSTALL_DIR/bin:$PATH"
+
+    # Remove /usr/local/bin in PATH in case of Python prior installation
+    PATH=$(echo $CLEAR_PATH | sed 's@/usr/local/bin:@@')
+
+    # Move an existing Python binary, to avoid to block pyenv
+    #test -x /usr/bin/python && mv /usr/bin/python /usr/bin/python_pyenv
+
+    # Install or update pyenv
+    mkdir -p $PYENV_INSTALL_DIR
+    pyenv="$(command -v pyenv $PYENV_INSTALL_DIR/bin/pyenv | grep "$PYENV_INSTALL_DIR/bin/pyenv" | head -1)"
+    if [ -n "$pyenv" ]; then
+        pushd "${pyenv%/*/*}"
+        if git remote -v 2> /dev/null | grep "https://github.com/pyenv/pyenv.git"; then
+            echo "Updating pyenv..."
+            git pull -q --tags origin master
+            _ynh_python_try_bash_extension
+        else
+            echo "Reinstalling pyenv..."
+            cd ..
+            ynh_safe_rm $PYENV_INSTALL_DIR
+            mkdir -p $PYENV_INSTALL_DIR
+            cd $PYENV_INSTALL_DIR
+            git init -q
+            git remote add -f -t master origin https://github.com/pyenv/pyenv.git > /dev/null 2>&1
+            git checkout -q -b master origin/master
+            _ynh_python_try_bash_extension
+            pyenv=$PYENV_INSTALL_DIR/bin/pyenv
+        fi
+        popd
+    else
+        echo "Installing pyenv..."
+        pushd $PYENV_INSTALL_DIR
+        git init -q
+        git remote add -f -t master origin https://github.com/pyenv/pyenv.git > /dev/null 2>&1
+        git checkout -q -b master origin/master
+        _ynh_python_try_bash_extension
+        pyenv=$PYENV_INSTALL_DIR/bin/pyenv
+        popd
+    fi
+
+    mkdir -p "${PYENV_INSTALL_DIR}/plugins"
+
+    pyenv_latest="$(command -v "$PYENV_INSTALL_DIR"/plugins/*/bin/pyenv-latest pyenv-latest | head -1)"
+    if [ -n "$pyenv_latest" ]; then
+        pushd "${pyenv_latest%/*/*}"
+        if git remote -v 2> /dev/null | grep "https://github.com/momo-lab/xxenv-latest.git"; then
+            echo "Updating xxenv-latest..."
+            git pull -q origin master
+        fi
+        popd
+    else
+        echo "Installing xxenv-latest..."
+        git clone -q https://github.com/momo-lab/xxenv-latest.git "${PYENV_INSTALL_DIR}/plugins/xxenv-latest"
+    fi
+
+    # Enable caching
+    mkdir -p "${PYENV_INSTALL_DIR}/cache"
+
+    # Create shims directory if needed
+    mkdir -p "${PYENV_INSTALL_DIR}/shims"
+
+    # Restore /usr/local/bin in PATH
+    PATH=$CLEAR_PATH
+
+    # And replace the old Python binary
+    test -x /usr/bin/python_pyenv && mv /usr/bin/python_pyenv /usr/bin/python
+
+    # Install the requested version of Python
+    local final_python_version=$(pyenv latest --known $python_version)
+    if ! [ -n "$final_python_version" ]; then
+        final_python_version=$python_version
+    fi
+    echo "Installing Python $final_python_version"
+    pyenv install --skip-existing $final_python_version > /dev/null 2>&1
+
+    # Store python_version into the config of this app
+    ynh_app_setting_set --key=python_version --value=$final_python_version
+    python_version=$final_python_version
+
+    # Cleanup Python versions
+    _ynh_python_cleanup
+
+    # Set environment for Python users
+    echo "#pyenv
+#export PYENV_ROOT=$PYENV_INSTALL_DIR
+#export PATH=\"$PYENV_INSTALL_DIR/bin:$PATH\"
+#eval \"\$(pyenv init -)\"
+#pyenv" > /etc/profile.d/pyenv.sh
+
+    # Load the environment
+    export HOME=${HOME:-"/root/"}
+    #eval "$(pyenv init -)"
+
+    _ynh_load_python_in_path_and_other_tweaks
+}
+
+# Remove the version of Python used by the app.
+#
+# This helper will also cleanup unused Python versions
+#
+# usage: ynh_python_remove
+ynh_python_remove() {
+
+    [[ -n "${python_version:-}" ]] || ynh_die "\$python_version should be defined prior to calling ynh_python_remove"
+
+    # Load pyenv path in PATH
+    local CLEAR_PATH="$PYENV_INSTALL_DIR/bin:$PATH"
+
+    # Remove /usr/local/bin in PATH in case of Python prior installation
+    PATH=$(echo $CLEAR_PATH | sed 's@/usr/local/bin:@@')
+
+    # Remove the line for this app
+    ynh_app_setting_delete --key=python_version
+
+    # Cleanup Python versions
+    _ynh_python_cleanup
+}
+
+# Remove no more needed versions of Python used by the app.
+#
+# [internal]
+#
+# This helper will check what Python version are no more required,
+# and uninstall them
+# If no app uses Python, pyenv will be also removed.
+_ynh_python_cleanup() {
+
+    # List required Python versions
+    local installed_apps=$(yunohost app list | grep -oP 'id: \K.*$')
+    local required_python_versions=""
+    for installed_app in $installed_apps; do
+        local installed_app_python_version=$(ynh_app_setting_get --app=$installed_app --key="python_version")
+        if [[ -n "$installed_app_python_version" ]]; then
+            required_python_versions="${installed_app_python_version}\n${required_python_versions}"
+        fi
+    done
+
+    # Remove no more needed Python versions
+    local installed_python_versions=$(pyenv versions --bare --skip-aliases | grep -Ev '/')
+    for installed_python_version in $installed_python_versions; do
+        if ! echo ${required_python_versions} | grep -q "${installed_python_version}"; then
+            echo "Removing Python-$installed_python_version"
+            $PYENV_INSTALL_DIR/bin/pyenv uninstall --force $installed_python_version
+        fi
+    done
+
+    # If none Python version is required
+    if [[ -z "$required_python_versions" ]]; then
+        # Remove pyenv environment configuration
+        echo "Removing pyenv"
+        ynh_safe_rm "$PYENV_INSTALL_DIR"
+        ynh_safe_rm "/etc/profile.d/pyenv.sh"
+    fi
+}
+
+_ynh_python_try_bash_extension() {
+    if [ -x src/configure ]; then
+        src/configure && make -C src 2>&1 || {
+            ynh_print_info "Optional bash extension failed to build, but things will still work normally."
+        }
+    fi
+}

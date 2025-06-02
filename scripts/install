@@ -6,6 +6,7 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
+source ynh_python_install
 
 ### Install parameters are automatically saved as settings
 ###
@@ -57,6 +58,8 @@ ynh_setup_source --dest_dir="$install_dir"
 ynh_exec_as_app mkdir -p "$install_dir/_build/venv"
 ynh_exec_as_app mkdir -p "$install_dir/_build/frontend"
 ynh_exec_as_app mkdir -p "$install_dir/_build/data/static"
+
+ynh_python_install
 
 pushd "$install_dir/_build/venv"
   ynh_exec_as_app python3.11 -m venv .

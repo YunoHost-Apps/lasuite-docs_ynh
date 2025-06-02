@@ -89,7 +89,7 @@ ram.runtime = "50M"
     # This will pick a random port for reverse-proxying and store it as the $port setting
 
     [resources.apt]
-    packages = "redis, python3, python3-venv, python3-setuptools, python3-pip, postgresql, rdfind, celery"
+    packages = "redis, postgresql, rdfind, celery"
 
     [resources.database]
     type = "postgresql"
