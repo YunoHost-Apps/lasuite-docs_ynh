@@ -40,14 +40,6 @@ ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
 ynh_app_setting_set --key=django_secret_key --value=$django_secret_key
 
 #=================================================
-# FIND AND OPEN A PORT
-#=================================================
-ynh_script_progression "Configuring firewall..."
-
-# Reserve UDP Port range 49152:65535
-ynh_hide_warnings yunohost firewall allow UDP -4 49152:65535
-
-#=================================================
 # INSTALL DEX APP FOR OAUTH2 / OIDC
 #=================================================
 ynh_script_progression "Installing Dex..."
