@@ -80,11 +80,11 @@ pushd "$install_dir/src/backend"
 popd
 
 pushd "$install_dir/src/frontend"
-  ynh_hide_warnings ynh_exec_as_app npm ci
   ynh_hide_warnings ynh_exec_as_app yarn install
-  ynh_hide_warnings ynh_exec_as_app yarn app:build
+  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn app:build
   ynh_hide_warnings ynh_exec_as_app yarn app:start
-  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production VITE_API_BASE_URL="https://${domain}" npm run build -- --outDir="$install_dir/_build/frontend" --emptyOutDir
+  # FIXME: if needed: NEXT_PUBLIC_API_ORIGIN="https://${domain}". Otherwise remove this comment
+  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production npm run build -- --outDir="$install_dir/_build/frontend" --emptyOutDir
 popd
 
 
