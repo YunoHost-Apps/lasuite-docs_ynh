@@ -6,7 +6,6 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
-source ynh_python_install
 
 ### Install parameters are automatically saved as settings
 ###
@@ -59,24 +58,11 @@ ynh_exec_as_app mkdir -p "$install_dir/_build/venv"
 ynh_exec_as_app mkdir -p "$install_dir/_build/frontend"
 ynh_exec_as_app mkdir -p "$install_dir/_build/data/static"
 
-#ynh_python_install
-
-if [ -z "$(which python3.12)" ]; then
-    wget https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tar.xz
-    tar -xvf Python-3.12.10.tar.xz
-    cd Python-3.12.10
-    ./configure --enable-optimizations
-    make
-    sudo make altinstall
-    python3.12 -m ensurepip
-fi
-
 pushd "$install_dir/_build/venv"
-  ynh_exec_as_app python3.12 -m venv .
-  source ./bin/activate
-  ynh_hide_warnings ynh_exec_as_app pip install "$install_dir/src/backend"
-  ynh_hide_warnings ynh_exec_as_app pip freeze > requirements.txt
-  ynh_hide_warnings ynh_exec_as_app pip install -r requirements.txt
+  ynh_exec_as_app python3.11 -m venv .
+  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install "$install_dir/src/backend"
+  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 freeze > requirements.txt
+  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install -r requirements.txt
   ynh_exec_as_app python manage.py migrate
 popd
 
