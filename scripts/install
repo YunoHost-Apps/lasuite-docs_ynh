@@ -40,13 +40,6 @@ ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
 ynh_app_setting_set --key=django_secret_key --value=$django_secret_key
 
 #=================================================
-# INSTALL DEX APP FOR OAUTH2 / OIDC
-#=================================================
-ynh_script_progression "Installing Dex..."
-
-install_dex
-
-#=================================================
 # INSTALL NODEJS
 #=================================================
 
