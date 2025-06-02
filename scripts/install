@@ -71,8 +71,23 @@ pushd "$install_dir/src/frontend"
   mv ./apps/impress/out "$install_dir/_build/frontend"
 popd
 
-
 chown -R "$app:www-data" "$install_dir"
+
+#=================================================
+# BUILD YARN DEPENDENCIES YJS
+#=================================================
+y_provider_api_key=$(ynh_string_random -l 32)
+collaboration_server_origin="https://$DOMAIN/yjs"
+collaboration_server_secret=$(ynh_string_random -l 32)
+ynh_app_setting_set --key=y_provider_api_key --value=$y_provider_api_key
+ynh_app_setting_set --key=collaboration_server_secret --value=$collaboration_server_secret
+ynh_app_setting_set --key=collaboration_server_origin --value=$collaboration_server_origin
+
+pushd "$install_dir/src/frontend/servers/y-provider"
+	ynh_hide_warnings ynh_exec_as_app yarn install --production --pure-lockfile
+	ynh_hide_warnings ynh_exec_as_app yarn build
+  ynh_hide_warnings ynh_exec_as_app yarn cache clean
+popd
 
 #=================================================
 # APP INITIAL CONFIGURATION
@@ -82,6 +97,11 @@ ynh_script_progression "Adding $app's configuration files..."
 ynh_config_add --template="env" --destination="$install_dir/.env"
 chmod 400 "$install_dir/.env"
 chown "$app:$app" "$install_dir/.env"
+
+# YJS
+ynh_config_add --template="env" --destination="$install_dir/.env_ys"
+chmod 400 "$install_dir/.env_ys"
+chown "$app:$app" "$install_dir/.env_ys"
 
 #=================================================
 # SYSTEM CONFIGURATION

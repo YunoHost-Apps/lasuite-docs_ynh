@@ -1,0 +1,8 @@
+APP_FOLDER="/src/frontend/servers/y-provider"
+CC_NODE_BUILD_TOOL="yarn"
+CC_PRE_BUILD_HOOK="cd ./src/frontend/servers/y-provider && yarn install --frozen-lockfile && yarn build"
+CC_RUN_COMMAND="cd ./src/frontend/servers/y-provider && yarn start"
+COLLABORATION_LOGGING="true"
+COLLABORATION_SERVER_ORIGIN=__COLLABORATION_SERVER_ORIGIN__
+COLLABORATION_SERVER_SECRET=__COLLABORATION_SERVER_SECRET__
+Y_PROVIDER_API_KEY=__Y_PROVIDER_API_KEY__
