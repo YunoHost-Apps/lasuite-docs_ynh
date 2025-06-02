@@ -7,44 +7,24 @@ name = "Docs"
 description.en = "Collaborate and write in real time, with no layout constraints"
 description.fr = "Collaborer et écrire en temps réel, sans contrainte de mise en page"
 
-version = "3.1.0~ynh1"
+version = "3.3.0~ynh1"
 
-maintainers = ["fflorent"]
+maintainers = ["fflorent", "Ddataa", "mjeammet", "Flightan"]
 
 [upstream]
-# NB: Only the "license" key is mandatory. Remove entries for which there's no relevant data
-license = "free" # you can see the available licenses identifiers list here: https://spdx.org/licenses/
+license = "MIT"
 website = "https://docs.numerique.gouv.fr"
 demo = "https://docs.numerique.gouv.fr"
 code = "https://github.com/suitenumerique/docs/"
-# FIXME: optional but recommended if relevant, this is meant to contain the Common Platform Enumeration, which is
-# sort of a standard id for applications defined by the NIST. In particular, YunoHost may use this is in the future
-# to easily track CVE (=security reports) related to apps. The CPE may be obtained by searching here:
-# https://nvd.nist.gov/products/cpe/search.
-# For example, for Nextcloud, the CPE is 'cpe:2.3:a:nextcloud:nextcloud' (no need to include the version number)
-cpe = "???"
-
-# FIXME: optional but recommended (or remove if irrelevant / not applicable).
-# This is meant to be an URL where people can financially support this app, especially when its development is based
-# on volunteers and/or financed by its community. YunoHost may later advertise it in the webadmin.
-fund = "???"
 
 [integration]
 yunohost = ">= 12.0.9"
 helpers_version = "2.1"
-# FIXME: can be replaced by a list of supported archs using the dpkg --print-architecture nomenclature (amd64/i386/armhf/arm64), for example: ["amd64", "i386"]
-architectures = "all"
+architectures = ["amd64", "arm64", "armhf"]
 multi_instance = true
 
-# FIXME: replace with true, false, or "not_relevant".
-# Not to confuse with the "sso" key: the "ldap" key corresponds to wether or not a user *can* login on the app using
-# its YunoHost credentials.
-ldap = "?"
-
-# FIXME: replace with true, false, or "not_relevant".
-# Not to confuse with the "ldap" key: the "sso" key corresponds to wether or not a user is *automatically logged-in*
-# on the app when logged-in on the YunoHost portal.
-sso = "?"
+ldap = false
+sso = true
 
 # FIXME: replace with an **estimate** minimum disk and RAM requirements. e.g. 20M, 400M, 1G...
 disk = "50M"
@@ -52,18 +32,26 @@ ram.build = "50M"
 ram.runtime = "50M"
 
 [install]
+    [install.dex]
+    type = "app"
+    filter = "match(id, '^(dex)(__[0-9+])?$')"
+    ask.en = "Select the Dex app that will handle authentication for Headscale."
+    ask.fr = "Sélectionnez l'app Dex qui gérera l'authentification pour Headscale."
+    help.en = "You need to have at least one instance of Dex installed beforehand on your server."
+    help.fr = "Vous devez avoir au moins une instance de Dex préalablement installée sur votre serveur."
+
+    [install.s3]
+    type = "app"
+    filter = "match(id, '^(minio|garage)(__[0-9+])?$')"
+    ask.en = "Select the S3 app (Garage or Minio) that will handle authentication for Headscale."
+    ask.fr = "Sélectionnez l'app S3 (Garage ou Minio) qui gérera l'authentification pour Headscale."
+    help.en = "You need to have at least one instance of Garage or Minio installed beforehand on your server."
+    help.fr = "Vous devez avoir au moins une instance de Garage ou Minio préalablement installée sur votre serveur."
+
     [install.domain]
-    # this is a generic question - ask strings are automatically handled by YunoHost's core
     type = "domain"
 
-    [install.path]
-    # this is a generic question - ask strings are automatically handled by YunoHost's core
-    type = "path"
-    default = "/example"
-
     [install.init_main_permission]
-    # this is a generic question - ask strings are automatically handled by YunoHost's core
-    # This won't be saved as setting and will instead be used to initialize the SSOwat permission
     type = "group"
     default = "visitors"
 
@@ -73,17 +61,6 @@ ram.runtime = "50M"
     type = "select"
     choices = ["fr", "en"]
     default = "fr"
-
-    [install.admin]
-    # this is a generic question - ask strings are automatically handled by YunoHost's core
-    type = "user"
-
-    [install.password]
-    # this is a generic question - ask strings are automatically handled by YunoHost's core
-    # Note that user-provided passwords questions are not automatically saved as setting
-    help.en = "Use the help field to add an information for the admin about this question."
-    help.fr = "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
-    type = "password"
 
 [resources]
     # See the packaging documentation for the full set
@@ -95,26 +72,13 @@ ram.runtime = "50M"
     # This will pre-fetch the asset which can then be deployed during the install/upgrade scripts with :
     #    ynh_setup_source --dest_dir="$install_dir"
     # You can also define other assets than "main" and add --source_id="foobar" in the previous command
-    url = "https://github.com/foo/bar/archive/refs/tags/v1.2.3.tar.gz"
-    sha256 = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-
-    # These infos are used by https://github.com/YunoHost/apps_tools/blob/main/autoupdate_app_sources/autoupdate_app_sources.py
-    # to auto-update the previous asset urls and sha256sum + manifest version
-    # assuming the upstream's code repo is on github and relies on tags or releases
-    # See the 'sources' resource documentation for more details
-
-    # autoupdate.strategy = "latest_github_tag"
+    url = "https://github.com/suitenumerique/docs/archive/refs/tags/v3.3.0.tar.gz"
+    sha256 = "9ed339e1dae84a288e171b0d3829e3916d7e250de496e4f235d6bf8ea3424e18"
+    autoupdate.strategy = "latest_github_tag"
 
     [resources.system_user]
-    # This will provision/deprovision a unix system user
 
     [resources.install_dir]
-    # This will create/remove the install dir as /var/www/$app
-    # and store the corresponding setting $install_dir
-
-    [resources.data_dir]
-    # This will create/remove the data dir as /home/yunohost.app/$app
-    # and store the corresponding setting $data_dir
 
     [resources.permissions]
     # This will configure SSOwat permission for $domain/$path/
@@ -125,10 +89,7 @@ ram.runtime = "50M"
     # This will pick a random port for reverse-proxying and store it as the $port setting
 
     [resources.apt]
-    # This will automatically install/uninstall the following apt packages
-    # and implicitly define the $phpversion setting as 8.0 (if phpX.Y-foobar dependencies are listed)
-    packages = "mariadb-server, deb1, deb2, php8.3-foo, php8.3-bar"
+    packages = "redis, python3, python3-venv, python3-setuptools, python3-pip, postgresql, rdfind, celery"
 
     [resources.database]
-    # This will automatically provision/deprovison a MySQL DB and store the corresponding credentials in settings $db_user, $db_name, $db_pwd
-    type = "mysql"
+    type = "postgresql"
