@@ -63,15 +63,9 @@ ram.runtime = "50M"
     default = "fr"
 
 [resources]
-    # See the packaging documentation for the full set
-    # of explanation regarding the behavior and properties for each of those
-
     [resources.sources]
 
     [resources.sources.main]
-    # This will pre-fetch the asset which can then be deployed during the install/upgrade scripts with :
-    #    ynh_setup_source --dest_dir="$install_dir"
-    # You can also define other assets than "main" and add --source_id="foobar" in the previous command
     url = "https://github.com/suitenumerique/docs/archive/refs/tags/v3.3.0.tar.gz"
     sha256 = "9ed339e1dae84a288e171b0d3829e3916d7e250de496e4f235d6bf8ea3424e18"
     autoupdate.strategy = "latest_github_tag"
@@ -81,15 +75,14 @@ ram.runtime = "50M"
     [resources.install_dir]
 
     [resources.permissions]
-    # This will configure SSOwat permission for $domain/$path/
-    # The initial allowed group of user is configured via the init_main_permission question (public=visitors, private=all_users)
     main.url = "/"
 
     [resources.ports]
-    # This will pick a random port for reverse-proxying and store it as the $port setting
+    backend.default = 8000
+    yprovider.default = 8001
 
     [resources.apt]
-    packages = "redis, postgresql, rdfind, celery"
+    packages = "redis, python3, python3-venv, python3-setuptools, python3-pip, postgresql, rdfind, celery"
     extras.yarn.repo = "deb https://dl.yarnpkg.com/debian/ stable main"
     extras.yarn.key = "https://dl.yarnpkg.com/debian/pubkey.gpg"
     extras.yarn.packages = "yarn"

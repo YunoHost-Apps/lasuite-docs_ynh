@@ -1,14 +1,14 @@
 [Unit]
-Description=Docs backend service
+Description=Docs Y-provider service
 After=network.target
 
 [Service]
 Type=simple
 User=__APP__
 Group=__APP__
-WorkingDirectory=__INSTALL_DIR__/
-EnvironmentFile=__INSTALL_DIR__/.env
-ExecStart=__INSTALL_DIR__/_build/venv/bin/gunicorn -c __INSTALL_DIR__/docs-conf.py docs.wsgi:application
+WorkingDirectory=__INSTALL_DIR__/src/frontend/servers/y-provider
+EnvironmentFile=__INSTALL_DIR__/.env_yjs
+ExecStart=yarn start
 StandardOutput=append:/var/log/__APP__/__APP__.log
 StandardError=inherit
 

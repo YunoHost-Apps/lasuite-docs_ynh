@@ -90,22 +90,6 @@ pushd "$install_dir/src/frontend/servers/y-provider"
 popd
 
 #=================================================
-# BUILD YARN DEPENDENCIES YJS
-#=================================================
-y_provider_api_key=$(ynh_string_random -l 32)
-collaboration_server_origin="https://$DOMAIN/yjs"
-collaboration_server_secret=$(ynh_string_random -l 32)
-ynh_app_setting_set --key=y_provider_api_key --value=$y_provider_api_key
-ynh_app_setting_set --key=collaboration_server_secret --value=$collaboration_server_secret
-ynh_app_setting_set --key=collaboration_server_origin --value=$collaboration_server_origin
-
-pushd "$install_dir/src/frontend/servers/y-provider"
-	ynh_hide_warnings ynh_exec_as_app yarn install --production --pure-lockfile
-	ynh_hide_warnings ynh_exec_as_app yarn build
-  ynh_hide_warnings ynh_exec_as_app yarn cache clean
-popd
-
-#=================================================
 # APP INITIAL CONFIGURATION
 #=================================================
 ynh_script_progression "Adding $app's configuration files..."
@@ -115,14 +99,35 @@ chmod 400 "$install_dir/.env"
 chown "$app:$app" "$install_dir/.env"
 
 # YJS
-ynh_config_add --template="env" --destination="$install_dir/.env_ys"
+ynh_config_add --template="env_js" --destination="$install_dir/.env_ys"
 chmod 400 "$install_dir/.env_ys"
 chown "$app:$app" "$install_dir/.env_ys"
 
-# YJS
-ynh_config_add --template="env" --destination="$install_dir/.env_ys"
-chmod 400 "$install_dir/.env_ys"
-chown "$app:$app" "$install_dir/.env_ys"
+ynh_config_add --template="docs.py" --destination="$install_dir/docs-conf.py"
+chmod 400 "$install_dir/docs-conf.py"
+chown "$app:$app" "$install_dir/docs-conf.py"
+
+#=================================================
+# APP INITIAL CONFIGURATION
+#=================================================
+ynh_script_progression "Creating S3 Bucket"
+
+s3="${s3:-minio}"
+
+if [[ "${s3}" =~ "minio"* ]]; then
+  minio_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
+  minio_admin=$(ynh_app_setting_get --app="$s3" --key=admin)
+  minio_password=$(ynh_app_setting_get --app="$s3" --key=password)
+  mc_path=$(ynh_app_setting_get --app="$s3" --key=mc_path)
+
+  ynh_exec_warn_less sudo -u "$s3" "$mc_path/mc" mb "minio/$app"
+
+  ynh_app_setting_set --key="$s3_domain" --value="$minio_domain"
+  ynh_app_setting_set --key="$s3_user" --value="$minio_admin"
+  ynh_app_setting_set --key="$s3_password" --value="$minio_password"
+else
+  ynh_die "garage not yet supported"
+fi
 
 #=================================================
 # SYSTEM CONFIGURATION
@@ -133,6 +138,7 @@ ynh_config_add_nginx
 
 # Create a dedicated systemd config
 ynh_config_add_systemd
+ynh_config_add_systemd --service="${app}-yprovider" --template="systemd-yprovider.service"
 
 yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
 
