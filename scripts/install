@@ -48,9 +48,9 @@ if [[ "${s3}" =~ minio* ]]; then
 
   sudo -u "$s3" "$minio_install_dir/mc" mb "minio/$app"
 
-  ynh_app_setting_set --key="$s3_domain" --value="$minio_domain"
-  ynh_app_setting_set --key="$s3_user" --value="$minio_admin"
-  ynh_app_setting_set --key="$s3_password" --value="$minio_password"
+  ynh_app_setting_set --key="s3_domain" --value="$minio_domain"
+  ynh_app_setting_set --key="s3_user" --value="$minio_admin"
+  ynh_app_setting_set --key="s3_password" --value="$minio_password"
 else
   ynh_die "garage not yet supported"
 fi
