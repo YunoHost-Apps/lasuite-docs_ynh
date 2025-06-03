@@ -38,6 +38,7 @@ fi
 ynh_config_remove_systemd
 
 ynh_config_remove_systemd "${app}-yprovider"
+ynh_config_remove_systemd "${app}-celery"
 
 ynh_config_remove_nginx
 
