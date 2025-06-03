@@ -1,1 +1,3 @@
-This is a dummy description of this app features
+Collaborative notetaking made simple. Docs is part of La Suite Numérique.
+
+![Example of a document](screenshots/example_en.jpg)
