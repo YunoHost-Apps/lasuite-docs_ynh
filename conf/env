@@ -21,6 +21,7 @@ LOGIN_REDIRECT_URL=/
 FRONTEND_HOMEPAGE_FEATURE_ENABLED=true
 
 COLLABORATION_API_URL=https://__DOMAIN__/yprovider/collaboration/api
+COLLABORATION_WS_URL=https://__DOMAIN__/yprovider/collaboration/ws
 
 Y_PROVIDER_API_KEY=__Y_PROVIDER_API_KEY__
 Y_PROVIDER_API_BASE_URL=https://__DOMAIN__/yprovider/api
