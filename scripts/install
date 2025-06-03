@@ -46,7 +46,7 @@ if [[ "${s3}" =~ minio* ]]; then
   minio_install_dir=$(ynh_app_setting_get --app="$s3" --key=install_dir)
   minio_password=$(grep -Po "MINIO_ROOT_PASSWORD=\K.*" "$minio_install_dir/.env") # FIXME: should be read from ynh_app_setting_get instead
 
-  ynh_exec_warn_less sudo -u "$s3" "$minio_install_dir/mc" mb "minio/$app"
+  sudo -u "$s3" "$minio_install_dir/mc" mb "minio/$app"
 
   ynh_app_setting_set --key="$s3_domain" --value="$minio_domain"
   ynh_app_setting_set --key="$s3_user" --value="$minio_admin"
