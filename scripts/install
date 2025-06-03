@@ -77,11 +77,9 @@ chown -R "$app:www-data" "$install_dir"
 # BUILD YARN DEPENDENCIES YJS
 #=================================================
 y_provider_api_key=$(ynh_string_random -l 32)
-collaboration_server_origin="https://$domain/yjs"
 collaboration_server_secret=$(ynh_string_random -l 32)
 ynh_app_setting_set --key=y_provider_api_key --value=$y_provider_api_key
 ynh_app_setting_set --key=collaboration_server_secret --value=$collaboration_server_secret
-ynh_app_setting_set --key=collaboration_server_origin --value=$collaboration_server_origin
 
 pushd "$install_dir/src/frontend/servers/y-provider"
 	ynh_hide_warnings ynh_exec_as_app yarn install --pure-lockfile
