@@ -40,7 +40,7 @@ ynh_script_progression "Creating S3 Bucket"
 
 s3="${s3:-minio}"
 
-if [[ "${s3}" =~ "minio"* ]]; then
+if [[ "${s3}" =~ minio* ]]; then
   minio_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
   minio_admin=$(ynh_app_setting_get --app="$s3" --key=admin)
   minio_password=$(ynh_app_setting_get --app="$s3" --key=password)
