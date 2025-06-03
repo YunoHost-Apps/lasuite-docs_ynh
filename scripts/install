@@ -56,7 +56,23 @@ if [[ "${s3}" =~ minio* ]]; then
   ynh_app_setting_set --key="s3_user" --value="$s3_user"
   ynh_app_setting_set --key="s3_password" --value="$s3_password"
 else
-  ynh_die "garage not yet supported"
+  #ynh_die "garage not yet supported"
+  # make sure garage is working before : 
+    #replica in conf at 1 if no other nodes
+    #create a layout ex: ./garage -c ./garage.toml layout assign -z dc1 -c 2G b22365a3ad01f44f
+    #apply layout ex: ./garage -c ./garage.toml layout show && ./garage -c ./garage.toml layout apply --version 1
+  # create bucket
+  sudo -u "garage" /var/www/garage/garage -c /var/www/garage/garage.toml bucket create docs-bucket
+  # create key
+  sudo -u "garage" /var/www/garage/garage -c /var/www/garage/garage.toml key create docs-key > "$install_dir/key-bucket.txt"
+  # authorize key to bucket
+  sudo -u "garage" /var/www/garage/garage -c /var/www/garage/garage.toml bucket allow --read --write --owner docs-bucket --key docs-key
+  # 
+  garage_password=$(grep -Po "Secret key" "$install_dir/key-bucket.txt")
+  garage_user=$(grep -Po "Key ID" "$install_dir/key-bucket.txt")
+  s3_domain=$(ynh_app_setting_get --app="garage" --key=domain)
+  ynh_app_setting_set --key="garage_user" --value="$garage_user"
+  ynh_app_setting_set --key="garage_password" --value="$garage_password"
 fi
 
 #=================================================
