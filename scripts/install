@@ -34,6 +34,28 @@ ynh_script_progression "Installing dependencies..."
 ynh_nodejs_install
 
 #=================================================
+# APP INITIAL CONFIGURATION
+#=================================================
+ynh_script_progression "Creating S3 Bucket"
+
+s3="${s3:-minio}"
+
+if [[ "${s3}" =~ "minio"* ]]; then
+  minio_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
+  minio_admin=$(ynh_app_setting_get --app="$s3" --key=admin)
+  minio_password=$(ynh_app_setting_get --app="$s3" --key=password)
+  mc_path=$(ynh_app_setting_get --app="$s3" --key=mc_path)
+
+  ynh_exec_warn_less sudo -u "$s3" "$mc_path/mc" mb "minio/$app"
+
+  ynh_app_setting_set --key="$s3_domain" --value="$minio_domain"
+  ynh_app_setting_set --key="$s3_user" --value="$minio_admin"
+  ynh_app_setting_set --key="$s3_password" --value="$minio_password"
+else
+  ynh_die "garage not yet supported"
+fi
+
+#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression "Setting up source files..."
@@ -104,28 +126,6 @@ chown "$app:$app" "$install_dir/.env_yjs"
 ynh_config_add --template="docs.py" --destination="$install_dir/docs-conf.py"
 chmod 400 "$install_dir/docs-conf.py"
 chown "$app:$app" "$install_dir/docs-conf.py"
-
-#=================================================
-# APP INITIAL CONFIGURATION
-#=================================================
-ynh_script_progression "Creating S3 Bucket"
-
-s3="${s3:-minio}"
-
-if [[ "${s3}" =~ "minio"* ]]; then
-  minio_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
-  minio_admin=$(ynh_app_setting_get --app="$s3" --key=admin)
-  minio_password=$(ynh_app_setting_get --app="$s3" --key=password)
-  mc_path=$(ynh_app_setting_get --app="$s3" --key=mc_path)
-
-  ynh_exec_warn_less sudo -u "$s3" "$mc_path/mc" mb "minio/$app"
-
-  ynh_app_setting_set --key="$s3_domain" --value="$minio_domain"
-  ynh_app_setting_set --key="$s3_user" --value="$minio_admin"
-  ynh_app_setting_set --key="$s3_password" --value="$minio_password"
-else
-  ynh_die "garage not yet supported"
-fi
 
 #=================================================
 # SYSTEM CONFIGURATION
