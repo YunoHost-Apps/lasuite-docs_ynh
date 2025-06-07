@@ -42,15 +42,14 @@ s3="${s3:-minio}"
 
 if [[ "${s3}" =~ minio* ]]; then
   s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
-  s3_user=$(ynh_app_setting_get --app="$s3" --key=admin)
   minio_install_dir=$(ynh_app_setting_get --app="$s3" --key=install_dir)
-  s3_password=$(grep -Po "MINIO_ROOT_PASSWORD=\K.*" "$minio_install_dir/.env") # FIXME: should be read from ynh_app_setting_get instead
+  s3_password=$(ynh_string_random -l 32)
+  s3_user=$app
 
-  matching_bucket_name=$(sudo -u "$s3" "$minio_install_dir/mc" ls --json minio/ | jq -r '.key | select(. =="docs/")')
-
-  if [ -z "$matching_bucket_name" ]; then
-    sudo -u "$s3" "$minio_install_dir/mc" mb "minio/$app"
-  fi
+  # FIXME: this script, if finally used, is only available starting with a certain version.
+  # We should abort the installation if MinIO is below the version that ships this script.
+  # PR: https://github.com/YunoHost-Apps/minio_ynh/pull/77
+  sudo -u minio "$minio_install_dir/setup_app_bucket.sh" --app="$app" --secret="$s3_password" --with-versioning
 
   ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
   ynh_app_setting_set --key="s3_user" --value="$s3_user"
