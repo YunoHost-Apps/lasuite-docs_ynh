@@ -11,8 +11,6 @@ nodejs_version=22
 
 python_version="3.12"
 
-dex_ynh_commit=d04fc79d385313a11bc9982454b4a659148db77c
-
 setup_dex() {
   # List the Dex apps installed on the system
   dex_apps="$(yunohost app list -f --output-as json | jq -r '[ .apps[] | select(.manifest.id == "dex") ]')"
@@ -58,8 +56,8 @@ setup_dex() {
   ynh_app_setting_set         --key=dex_install_dir       --value="$dex_install_dir"
   ynh_app_setting_set         --key=dex_user_uri          --value="$dex_user_uri"
   ynh_app_setting_set         --key=dex_auth_uri          --value="$dex_auth_uri"
+  ynh_app_setting_set         --key=dex_keys_uri          --value="$dex_keys_uri"
   ynh_app_setting_set         --key=dex_token_uri         --value="$dex_token_uri"
-  ynh_app_setting_set         --key=dex_user_uri          --value="$dex_user_uri"
   ynh_app_setting_set_default --key=oidc_name             --value="$app"
   ynh_app_setting_set         --key=oidc_callback         --value="$oidc_callback"
   ynh_app_setting_set_default --key=oidc_secret           --value="$(ynh_string_random --length=32 --filter='A-F0-9')"
