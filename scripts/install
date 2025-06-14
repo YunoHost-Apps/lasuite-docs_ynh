@@ -78,7 +78,7 @@ pushd "$install_dir/_build/venv"
 popd
 
 pushd "$install_dir/src/backend"
-  
+
   # Collect the static resources
   ynh_exec_as_app DATA_DIR="$install_dir/_build/data" DJANGO_CONFIGURATION=Build DJANGO_JWT_PRIVATE_SIGNING_KEY=Dummy \
     STATIC_ROOT="$install_dir/src/backend" \
