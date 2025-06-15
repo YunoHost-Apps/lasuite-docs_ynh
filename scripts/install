@@ -46,10 +46,9 @@ if [[ "${s3}" =~ minio* ]]; then
   s3_password=$(ynh_string_random -l 32)
   s3_user=$app
 
-  # FIXME: this script, if finally used, is only available starting with a certain version.
-  # We should abort the installation if MinIO is below the version that ships this script.
-  # PR: https://github.com/YunoHost-Apps/minio_ynh/pull/77
-  sudo -u minio "$minio_install_dir/setup_app_bucket.sh" --app="$app" --secret="$s3_password" --with-versioning
+  # FIXME: this script is currently in PR for the MinIO app:
+  # https://github.com/YunoHost-Apps/minio_ynh/pull/77
+  sudo -u minio "../sources/setup_app_bucket.sh" --app="$app" --secret="$s3_password" --with-versioning
 
   ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
   ynh_app_setting_set --key="s3_user" --value="$s3_user"
