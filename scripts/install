@@ -42,7 +42,6 @@ s3="${s3:-minio}"
 
 if [[ "${s3}" =~ minio* ]]; then
   s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
-  minio_install_dir=$(ynh_app_setting_get --app="$s3" --key=install_dir)
   s3_password=$(ynh_string_random -l 32)
   s3_user=$app
 
