@@ -40,8 +40,8 @@ if [ -z "${SECRET:-}" ]; then
   exit 1
 fi
 
-ACCESS_KEY=$APP
-BUCKET=$APP
+ACCESS_KEY=${APP//_/-}
+BUCKET=${APP//_/-}
 
 policy_file=$(mktemp --suffix=".$APP.policy.json")
 minio_install_dir=/var/www/minio
