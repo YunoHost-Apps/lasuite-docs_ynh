@@ -101,7 +101,11 @@ popd
 
 pushd "$install_dir/src/frontend"
   ynh_hide_warnings ynh_exec_as_app yarn install
-  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn app:build
+  ynh_hide_warnings ynh_exec_as_app yarn next telemetry disable
+popd
+
+pushd "$install_dir/src/frontend/apps/impress"
+  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn next build --no-lint
   mv ./apps/impress/out "$install_dir/_build/frontend"
 popd
 
