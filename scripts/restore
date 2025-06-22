@@ -9,81 +9,88 @@ source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
+# INSTALL NODEJS
+#=================================================
+ynh_script_progression "Reinstalling dependencies..."
+
+ynh_nodejs_install
+
+#=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
 ynh_script_progression "Restoring the app main directory..."
 
 ynh_restore "$install_dir"
 
-### $install_dir will automatically be initialized with some decent
-### permissions by default... however, you may need to recursively reapply
-### ownership to all files such as after the ynh_setup_source step
 chown -R "$app:www-data" "$install_dir"
 
 #=================================================
-# RESTORE THE DATA DIRECTORY
+# RESTORE THE POSTGRESQL DATABASE
 #=================================================
-ynh_script_progression "Restoring the data directory..."
+ynh_script_progression "Restoring the PostgreSQL database..."
 
-ynh_restore "$data_dir"
-
-### (Same as for install dir)
-chown -R "$app:www-data" "$data_dir"
+ynh_psql_db_shell < ./db.sql
 
 #=================================================
-# RESTORE THE MYSQL DATABASE
+# RESTORE REDIS AND REGENERATE CONFIG
 #=================================================
-ynh_script_progression "Restoring the MySQL database..."
+ynh_script_progression "Restoring Redis and $app's configuration files..."
 
-ynh_mysql_db_shell < ./db.sql
+redis_db=$(ynh_redis_get_free_db)
+celery_redis_db=$(ynh_redis_get_free_db)
+ynh_app_setting_set --key=redis_db --value=$redis_db
+ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
+
+ynh_config_add --template="env" --destination="$install_dir/.env"
+chmod 400 "$install_dir/.env"
+chown "$app:$app" "$install_dir/.env"
+
+# YJS
+ynh_config_add --template="env_yjs" --destination="$install_dir/.env_yjs"
+chmod 400 "$install_dir/.env_yjs"
+chown "$app:$app" "$install_dir/.env_yjs"
+
 
 #=================================================
 # RESTORE SYSTEM CONFIGURATION
 #=================================================
 ynh_script_progression "Restoring system configurations related to $app..."
 
-### This should be a symetric version of what happens in the install script
-
-ynh_restore "/etc/php/$php_version/fpm/pool.d/$app.conf"
-
 ynh_restore "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 ynh_restore "/etc/systemd/system/$app.service"
+ynh_restore "/etc/systemd/system/$app-yprovider.service"
+ynh_restore "/etc/systemd/system/$app-celery.service"
 systemctl enable "$app.service" --quiet
+systemctl enable "$app-yprovider.service" --quiet
+systemctl enable "$app-celery.service" --quiet
 
-yunohost service add "$app" --description="A short description of the app" --log="/var/log/$app/$app.log"
+yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
+yunohost service add "$app-yprovider" --description="Yprovider for Docs" --log="/var/log/$app/$app-yprovider.log"
+yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
 
 ynh_restore "/etc/logrotate.d/$app"
-
-ynh_restore "/etc/fail2ban/jail.d/$app.conf"
-ynh_restore "/etc/fail2ban/filter.d/$app.conf"
-ynh_systemctl --action=restart --service=fail2ban
 
 #=================================================
 # RESTORE VARIOUS FILES
 #=================================================
 
-ynh_restore "/etc/cron.d/$app"
-ynh_restore "/etc/$app/"
-
-### For apps with huge logs, you might want to not backup logs every time:
-### The mkdir call is just here in case the log directory was not backed up.
-### mkdir -p "/var/log/$app"
-### chown $app:www-data "/var/log/$app"
-### ynh_restore "/var/log/$app/" || true
-###
-### For other apps, the simple way is better:
 ynh_restore "/var/log/$app/"
 
 #=================================================
-# RELOAD NGINX AND PHP-FPM OR THE APP SERVICE
+# SETUP DEX FOR OIDC
+#=================================================
+setup_dex
+
+#=================================================
+# RELOAD NGINX AND THE APP SERVICE
 #=================================================
 ynh_script_progression "Reloading NGINX web server and $app's service..."
 
 ### Typically you only have either $app or PHP-FPM but not both at the same time...
 ynh_systemctl --service="$app" --action="start"
-
-ynh_systemctl --service="php$php_version-fpm" --action=reload
+ynh_systemctl --service="$app-yprovider" --action="start"
+ynh_systemctl --service="$app-celery" --action="start"
 
 ynh_systemctl --service=nginx --action=reload
 
