@@ -64,8 +64,13 @@ pushd "$install_dir/_build/venv"
   ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install -r requirements.txt
 popd
 
-pushd "$install_dir/src/backend"
+# Mail builder
+pushd "$install_dir/src/mail"
+  ynh_hide_warnings ynh_exec_as_app yarn install --frozen-lockfile
+  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn build
+popd
 
+pushd "$install_dir/src/backend"
   # Collect the static resources
   ynh_exec_as_app DATA_DIR="$install_dir/_build/data" DJANGO_CONFIGURATION=Build DJANGO_JWT_PRIVATE_SIGNING_KEY=Dummy \
     STATIC_ROOT="$install_dir/src/backend" \
@@ -81,12 +86,9 @@ pushd "$install_dir/src/backend"
     DJANGO_CONFIGURATION=Production \
     DB_NAME=$db_name DB_USER=$db_name DB_PASSWORD=$db_pwd \
     "$install_dir/_build/venv/bin/python" manage.py migrate
-popd
 
-# Mail builder
-pushd "$install_dir/src/mail"
-  ynh_hide_warnings ynh_exec_as_app yarn install --frozen-lockfile
-  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn build
+  # Move templates to where they are expected by impress settings
+  mv ../backend/core/templates "$install_dir/_build/venv/lib/"python3*/"site-packages/"
 popd
 
 pushd "$install_dir/src/frontend"
