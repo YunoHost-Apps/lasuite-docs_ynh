@@ -20,6 +20,10 @@ ynh_redis_remove_db "$celery_redis_db"
 
 ynh_nodejs_remove
 
+ynh_script_progression "Unregistering minio accesskey"
+access_key=${app//_/-}
+"/var/www/minio/mc" admin accesskey remove minio/ "$access_key"
+
 ynh_config_remove_logrotate
 
 # Remove the service from the list of services known by YunoHost (added from `yunohost service add`)
