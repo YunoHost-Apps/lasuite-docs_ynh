@@ -55,12 +55,16 @@ cleanup() {
 trap "cleanup" EXIT
 
 if "$minio_install_dir/mc" ls --json minio/ | jq -r ".key" | grep -q "^$APP/$"; then
-  echo "Bucket already exist, skip"
-  exit 0
+  echo "Bucket already exist"
+else
+  # Create a bucket in S3 for the app
+  "$minio_install_dir/mc" mb "${mb_opts[@]}" "minio/$BUCKET"
 fi
 
-# Create a bucket in S3 for the app
-"$minio_install_dir/mc" mb "${mb_opts[@]}" "minio/$BUCKET"
+if "$minio_install_dir/mc" admin accesskey ls --json minio/ | jq -r ".svcaccs[]?.accessKey" | grep "^$ACCESS_KEY$"; then
+  # Remove any existing access key and recreate it
+  "$minio_install_dir/mc" admin accesskey remove minio/ "$ACCESS_KEY"
+fi
 
 # Create a new policy to give only access to the app's bucket
 # The policy_file is temporary and will be cleaned up at the end of the execution
