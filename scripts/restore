@@ -37,7 +37,11 @@ ynh_psql_db_shell < ./db.sql
 ynh_script_progression "Restoring Redis and $app's configuration files..."
 
 redis_db=$(ynh_redis_get_free_db)
+redis-cli -n "$redis_db" SET __YNH_PROVISIONED "$app"
+
 celery_redis_db=$(ynh_redis_get_free_db)
+redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
+
 ynh_app_setting_set --key=redis_db --value=$redis_db
 ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
 

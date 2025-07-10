@@ -19,7 +19,9 @@ setup_dex
 # If you need to, you can define custom settings
 # (or remove this section entirely if not relevant for you)
 redis_db=$(ynh_redis_get_free_db)
+redis-cli -n "$redis_db" SET __YNH_PROVISIONED "$app"
 celery_redis_db=$(ynh_redis_get_free_db)
+redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
 django_secret_key=$(ynh_string_random -l 32)
 ynh_app_setting_set --key=redis_db --value=$redis_db
 ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
