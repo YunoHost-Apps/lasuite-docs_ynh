@@ -146,7 +146,7 @@ ynh_config_add --template="docs.py" --destination="$install_dir/docs-conf.py"
 chmod 400 "$install_dir/docs-conf.py"
 chown "$app:$app" "$install_dir/docs-conf.py"
 
-ynh_psql_db_shell "$db_name" <<< "update django_site set domain='$domain', name='$domain' where id=1;"
+ynh_psql_db_shell "$db_name" <<< "update django_site set domain='https://$domain', name='$domain' where id=1;"
 
 #=================================================
 # SYSTEM CONFIGURATION
