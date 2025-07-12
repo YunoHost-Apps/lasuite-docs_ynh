@@ -1,9 +1,5 @@
 #!/bin/bash
 
-## this script is only run if actual change to domain/path is detected, if you're here either $domain or $path changed
-## new location is available via $domain and $path (or $new_domain and $new_path variables if you want to be explicit)
-## old values are available via, you guessed it, $old_domain and $old_path
-
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
@@ -17,20 +13,39 @@ source /usr/share/yunohost/helpers
 ynh_script_progression "Stopping $app's systemd service..."
 
 ynh_systemctl --service="$app" --action="stop"
+ynh_systemctl --service="$app-yprovider" --action="stop"
+
+#=================================================
+# MODIFY URL IN NGINX CONF
+#=================================================
+ynh_script_progression "Update Dex to change the redirect URL..."
+
+setup_dex
 
 #=================================================
 # MODIFY URL IN NGINX CONF
 #=================================================
 ynh_script_progression "Updating NGINX web server configuration..."
 
-# this will most likely adjust NGINX config correctly
 ynh_config_change_url_nginx
 
 #=================================================
 # SPECIFIC MODIFICATIONS
 #=================================================
 
-## do any changes to files that reference specific installation domain/path, i.e. regenerate configs etc
+ynh_script_progression "Specific modifications..."
+
+ynh_psql_db_shell "$db_name" <<< "update django_site set domain='$domain', name='$domain' where id=1;"
+
+ynh_config_add --template="env" --destination="$install_dir/.env"
+chmod 400 "$install_dir/.env"
+chown "$app:$app" "$install_dir/.env"
+
+# YJS
+ynh_config_add --template="env_yjs" --destination="$install_dir/.env_yjs"
+chmod 400 "$install_dir/.env_yjs"
+chown "$app:$app" "$install_dir/.env_yjs"
+
 
 #=================================================
 # START SYSTEMD SERVICE
@@ -38,6 +53,7 @@ ynh_config_change_url_nginx
 ynh_script_progression "Starting $app's systemd service..."
 
 ynh_systemctl --service="$app" --action="start"
+ynh_systemctl --service="$app-yprovider" --action="start"
 
 #=================================================
 # END OF SCRIPT
