@@ -26,7 +26,9 @@ ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 # Backup the systemd service unit
 ynh_backup "/etc/systemd/system/$app.service"
 ynh_backup "/etc/systemd/system/$app-yprovider.service"
-ynh_backup "/etc/systemd/system/$app-celery.service"
+if use_celery; then
+  ynh_backup "/etc/systemd/system/$app-celery.service"
+fi
 
 # Backup the logrotate configuration
 ynh_backup "/etc/logrotate.d/$app"

@@ -65,3 +65,13 @@ setup_dex() {
   # Add the configuration file for the app in Dex
   bash "$dex_install_dir/add_config.sh" $app $oidc_name $oidc_callback $oidc_secret
 }
+
+use_celery() {
+  return $([ "${celery_redis_db:--1}" != "-1" ])
+}
+
+get_celery_broker_url() {
+  if use_celery; then
+    echo "redis://localhost:6379/$celery_redis_db"
+  fi
+}

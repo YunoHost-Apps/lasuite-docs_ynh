@@ -7,6 +7,8 @@
 source _common.sh
 source /usr/share/yunohost/helpers
 
+celery_broker_url=$(get_celery_broker_url)
+
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
@@ -14,7 +16,9 @@ ynh_script_progression "Stopping $app's systemd service..."
 
 ynh_systemctl --service="$app" --action="stop"
 ynh_systemctl --service="$app-yprovider" --action="stop"
-ynh_systemctl --service="$app-celery" --action="stop"
+if use_celery; then
+  ynh_systemctl --service="$app-celery" --action="stop"
+fi
 
 #=================================================
 # SETUP DEX FOR OIDC 
@@ -142,11 +146,14 @@ ynh_config_add_nginx
 # Create a dedicated systemd config
 ynh_config_add_systemd
 ynh_config_add_systemd --service="${app}-yprovider" --template="systemd-yprovider.service"
-ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
 
 yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
 yunohost service add "$app-yprovider" --description="Yprovider for Docs" --log="/var/log/$app/$app-yprovider.log"
-yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+
+if use_celery; then
+  ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
+  yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+fi
 
 # Use logrotate to manage application logfile(s)
 ynh_config_add_logrotate
@@ -158,7 +165,9 @@ ynh_script_progression "Starting $app's systemd service..."
 
 ynh_systemctl --service="$app" --action="start"
 ynh_systemctl --service="$app-yprovider" --action="start"
-ynh_systemctl --service="$app-celery" --action="start"
+if use_celery; then
+  ynh_systemctl --service="$app-celery" --action="start"
+fi
 
 #=================================================
 # END OF SCRIPT

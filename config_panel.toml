@@ -1,0 +1,19 @@
+#:schema https://github.com/YunoHost/apps/raw/main/schemas/config_panel.v1.schema.json
+version = "1.0"
+
+[main]
+name.en = "Main settings"
+name.fr = "Configuration principale"
+services = ["__APP__", "__APP__-yprovider"]
+
+    [main.advanced]
+    name.en = "Advanced"
+    name.fr = "Avancé"
+
+        [main.advanced.enable_celery]
+        ask.en = "Enable Celery workers"
+        ask.fr = "Activer les workers de Celery"
+        help.en = "Employing a Celery worker unlocks some features – like email sending – but it comes at the expense of increased RAM usage."
+        help.fr = "Exploiter les workers de Celery déverrouille quelques fonctionnalités, telles que l'envoi de mails, mais présente l'inconvénient d'augmenter l'utilisation de la RAM."
+        type = "boolean"
+        bind = "null"
