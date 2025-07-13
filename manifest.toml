@@ -83,7 +83,7 @@ ram.runtime = "50M"
     yprovider.default = 4444
 
     [resources.apt]
-    packages = "redis, python3, python3-venv, python3-setuptools, python3-pip, postgresql, rdfind, celery, gettext"
+    packages = "redis, python3, python3-venv, python3-setuptools, python3-pip, postgresql, rdfind, gettext"
     extras.yarn.repo = "deb https://dl.yarnpkg.com/debian/ stable main"
     extras.yarn.key = "https://dl.yarnpkg.com/debian/pubkey.gpg"
     extras.yarn.packages = "yarn"
