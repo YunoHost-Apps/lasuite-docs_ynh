@@ -20,12 +20,11 @@ setup_dex
 # (or remove this section entirely if not relevant for you)
 redis_db=$(ynh_redis_get_free_db)
 redis-cli -n "$redis_db" SET __YNH_PROVISIONED "$app"
-celery_redis_db=$(ynh_redis_get_free_db)
-redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
 django_secret_key=$(ynh_string_random -l 32)
 ynh_app_setting_set --key=redis_db --value=$redis_db
-ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
+ynh_app_setting_set --key=celery_redis_db --value=-1
 ynh_app_setting_set --key=django_secret_key --value=$django_secret_key
+celery_broker_url=$(get_celery_broker_url)
 
 #=================================================
 # INSTALL NODEJS
@@ -158,11 +157,9 @@ ynh_config_add_nginx
 # Create a dedicated systemd config
 ynh_config_add_systemd
 ynh_config_add_systemd --service="${app}-yprovider" --template="systemd-yprovider.service"
-ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
 
 yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
 yunohost service add "$app-yprovider" --description="Yprovider for Docs" --log="/var/log/$app/$app-yprovider.log"
-yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
 
 # Use logrotate to manage application logfile(s)
 ynh_config_add_logrotate
@@ -175,7 +172,6 @@ ynh_script_progression "Starting $app's systemd service..."
 # Start a systemd service
 ynh_systemctl --service="$app" --action="start"
 ynh_systemctl --service="$app-yprovider" --action="start"
-ynh_systemctl --service="$app-celery" --action="start"
 
 #=================================================
 # END OF SCRIPT
