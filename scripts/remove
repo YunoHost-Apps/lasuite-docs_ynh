@@ -12,11 +12,10 @@ source /usr/share/yunohost/helpers
 #=================================================
 ynh_script_progression "Removing system configurations related to $app..."
 
-redis_db=$(ynh_app_setting_get --key=redis_db)
-celery_redis_db=$(ynh_app_setting_get --key=celery_redis_db)
-
 ynh_redis_remove_db "$redis_db"
-ynh_redis_remove_db "$celery_redis_db"
+if use_celery; then
+  ynh_redis_remove_db "$celery_redis_db"
+fi
 
 ynh_nodejs_remove
 
@@ -33,13 +32,15 @@ fi
 if ynh_hide_warnings yunohost service status "$app-yprovider" >/dev/null; then
     yunohost service remove "$app-yprovider"
 fi
-if ynh_hide_warnings yunohost service status "$app-celery" >/dev/null; then
+if use_celery && ynh_hide_warnings yunohost service status "$app-celery" >/dev/null; then
     yunohost service remove "$app-celery"
 fi
 
 ynh_config_remove_systemd
 ynh_config_remove_systemd "${app}-yprovider"
-ynh_config_remove_systemd "${app}-celery"
+if use_celery; then
+    ynh_config_remove_systemd "${app}-celery"
+fi
 
 ynh_config_remove_nginx
 
@@ -48,9 +49,9 @@ ynh_safe_rm "$dex_install_dir/config.yaml.d/$app"
 
 if [ "${YNH_APP_PURGE:-0}" -eq 1 ]
 then
-  ynh_script_progression "Purging data from S3"
-  # TODO: remove the bucket and access key
-  ynh_print_warn "Purging data from S3 is not supported yet. If you would like to do that yourself, go to the MinIO admin panel or delete all the MinIO data"
+    ynh_script_progression "Purging data from S3"
+    # TODO: remove the bucket and access key
+    ynh_print_warn "Purging data from S3 is not supported yet. If you would like to do that yourself, go to the MinIO admin panel or delete all the MinIO data"
 fi
 
 #=================================================

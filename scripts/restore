@@ -8,6 +8,8 @@
 source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
+celery_broker_url=$(get_celery_broker_url)
+
 #=================================================
 # INSTALL NODEJS
 #=================================================
@@ -38,12 +40,13 @@ ynh_script_progression "Restoring Redis and $app's configuration files..."
 
 redis_db=$(ynh_redis_get_free_db)
 redis-cli -n "$redis_db" SET __YNH_PROVISIONED "$app"
-
-celery_redis_db=$(ynh_redis_get_free_db)
-redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
-
 ynh_app_setting_set --key=redis_db --value=$redis_db
-ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
+
+if use_celery; then
+  celery_redis_db=$(ynh_redis_get_free_db)
+  redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
+  ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
+fi
 
 ynh_config_add --template="env" --destination="$install_dir/.env"
 chmod 400 "$install_dir/.env"
@@ -63,15 +66,18 @@ ynh_script_progression "Restoring system configurations related to $app..."
 ynh_restore "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 ynh_restore "/etc/systemd/system/$app.service"
-ynh_restore "/etc/systemd/system/$app-yprovider.service"
-ynh_restore "/etc/systemd/system/$app-celery.service"
 systemctl enable "$app.service" --quiet
-systemctl enable "$app-yprovider.service" --quiet
-systemctl enable "$app-celery.service" --quiet
-
 yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
+
+ynh_restore "/etc/systemd/system/$app-yprovider.service"
+systemctl enable "$app-yprovider.service" --quiet
 yunohost service add "$app-yprovider" --description="Yprovider for Docs" --log="/var/log/$app/$app-yprovider.log"
-yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+
+if use_celery; then
+  ynh_restore "/etc/systemd/system/$app-celery.service"
+  systemctl enable "$app-celery.service" --quiet
+  yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+fi
 
 ynh_restore "/etc/logrotate.d/$app"
 
@@ -94,7 +100,9 @@ ynh_script_progression "Reloading NGINX web server and $app's service..."
 ### Typically you only have either $app or PHP-FPM but not both at the same time...
 ynh_systemctl --service="$app" --action="start"
 ynh_systemctl --service="$app-yprovider" --action="start"
-ynh_systemctl --service="$app-celery" --action="start"
+if use_celery; then
+  ynh_systemctl --service="$app-celery" --action="start"
+fi
 
 ynh_systemctl --service=nginx --action=reload
 

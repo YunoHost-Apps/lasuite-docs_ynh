@@ -1,12 +1,4 @@
 #!/bin/bash
-# In simple cases, you don't need a config script.
-
-# With a simple config_panel.toml, you can write in the app settings, in the
-# upstream config file or replace complete files (logo ...) and restart services.
-
-# The config scripts allows you to go further, to handle specific cases
-# (validation of several interdependent fields, specific getter/setter for a value,
-# display dynamic informations or choices, pre-loading of config type .cube... ).
 
 #=================================================
 # IMPORT GENERIC HELPERS
@@ -20,76 +12,50 @@ ynh_abort_if_errors
 # RETRIEVE ARGUMENTS
 #=================================================
 
-install_dir=$(ynh_app_setting_get --key=install_dir)
-
 #=================================================
 # SPECIFIC GETTERS FOR TOML SHORT KEY
 #=================================================
 
-get__amount() {
-    # Here we can imagine to have an API call to stripe to know the amount of donation during a month
-    local amount=200
+get__enable_celery() {
+  if use_celery; then
+    echo true;
+  else
+    echo false;
+  fi
+}
 
-    # It's possible to change some properties of the question by overriding it:
-    if [ "$amount" -gt 100 ]; then
-    cat << EOF
-style: success
-value: $amount
-ask:
-  en: A lot of donation this month: **$amount €**
-EOF
-    else
-    cat << EOF
-style: danger
-value: $amount
-ask:
-  en: Not so much donation this month: $amount €
-EOF
+set__enable_celery() {
+  if [ "$enable_celery" -eq 0 ]; then
+    systemctl stop "$app-celery"
+
+    ynh_redis_remove_db "$celery_redis_db"
+
+    if ynh_hide_warnings yunohost service status "$app-celery" >/dev/null; then
+        yunohost service remove "$app-celery"
     fi
-}
+    ynh_config_remove_systemd "${app}-celery"
 
-get__prices() {
-    local prices
-    prices="$(grep "DONATION\['" "$install_dir/settings.py" | sed -r "s@^DONATION\['([^']*)'\]\['([^']*)'\] = '([^']*)'@\1/\2/\3@g" | sed -z 's/\n/,/g;s/,$/\n/')"
-    if [ "$prices" == "," ]; then
-        # Return YNH_NULL if you prefer to not return a value at all.
-        echo YNH_NULL
-    else
-        echo "$prices"
-    fi
-}
+    celery_redis_db=-1
+  else
+    celery_redis_db=$(ynh_redis_get_free_db)
+    celery_broker_url=$(get_celery_broker_url)
+    redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
+    ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
 
-#=================================================
-# SPECIFIC VALIDATORS FOR TOML SHORT KEYS
-#=================================================
-validate__publishable_key() {
+    ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
+    yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+  fi
 
-    # We can imagine here we test if the key is really a publishable key
-    (is_secret_key "$publishable_key") &&
-        echo 'This key seems to be a secret key'
-}
+  ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
 
-#=================================================
-# SPECIFIC SETTERS FOR TOML SHORT KEYS
-#=================================================
-set__prices() {
+  ynh_config_add --template="env" --destination="$install_dir/.env"
+  chmod 400 "$install_dir/.env"
+  chown "$app:$app" "$install_dir/.env"
 
-    #---------------------------------------------
-    # IMPORTANT: setters are triggered only if a change is detected
-    #---------------------------------------------
-    for price in $(echo "$prices" | sed "s/,/ /"); do
-        frequency=$(echo "$price" | cut -d/ -f1)
-        currency=$(echo "$price" | cut -d/ -f2)
-        price_id=$(echo "$price" | cut -d/ -f3)
-        sed "d/DONATION\['$frequency'\]\['$currency'\]" "$install_dir/settings.py"
-
-        echo "DONATION['$frequency']['$currency'] = '$price_id'" >> "$install_dir/settings.py"
-    done
-
-    #---------------------------------------------
-    # IMPORTANT: to be able to upgrade properly, you have to save the value in settings too
-    #---------------------------------------------
-    ynh_app_setting_set --key=prices --value="$prices"
+  if [ "$enable_celery" -eq 1 ]; then
+    ynh_systemctl --service="$app-celery" --action="start"
+  fi
+  # other Docs service will be restarted automatically, as it is specified in the config_panel.toml
 }
 
 #=================================================
