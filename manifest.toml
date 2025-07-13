@@ -7,7 +7,7 @@ name = "Docs"
 description.en = "Collaborate and write in real time, with no layout constraints"
 description.fr = "Collaborer et écrire en temps réel, sans contrainte de mise en page"
 
-version = "3.3.0~ynh1"
+version = "3.4.0~ynh1"
 
 maintainers = ["fflorent", "Ddataa", "mjeammet", "Flightan"]
 
@@ -66,8 +66,8 @@ ram.runtime = "50M"
     [resources.sources]
 
     [resources.sources.main]
-    url = "https://github.com/suitenumerique/docs/archive/refs/tags/v3.3.0.tar.gz"
-    sha256 = "9ed339e1dae84a288e171b0d3829e3916d7e250de496e4f235d6bf8ea3424e18"
+    url = "https://github.com/suitenumerique/docs/archive/refs/tags/v3.4.0.tar.gz"
+    sha256 = "347df88da873b2b717cc052378be7fa4cec64a246400dc093bdf96fd8f89b878"
     autoupdate.strategy = "latest_github_tag"
 
     [resources.system_user]
