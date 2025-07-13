@@ -1,6 +1,6 @@
 [Unit]
 Description=Docs Celery service
-After=network.target
+After=network.target redis.service postgresql.service
 
 [Service]
 Type=simple
@@ -8,7 +8,7 @@ User=__APP__
 Group=__APP__
 WorkingDirectory=__INSTALL_DIR__/
 EnvironmentFile=__INSTALL_DIR__/.env
-ExecStart=celery -A impress.celery_app worker -l INFO -n impress@%h
+ExecStart=__INSTALL_DIR__/_build/venv/bin/celery -A impress.celery_app worker -l INFO -n __APP__@%%h --concurrency=1
 
 StandardOutput=append:/var/log/__APP__/__APP__-celery.log
 StandardError=inherit
