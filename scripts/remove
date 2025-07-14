@@ -50,6 +50,7 @@ if [ "${YNH_APP_PURGE:-0}" -eq 1 ]
 then
   ynh_script_progression "Purging data from S3"
   # TODO: remove the bucket and access key
+  ynh_print_warn "Purging data from S3 is not supported yet. If you would like to do that yourself, go to the MinIO admin panel or delete all the MinIO data"
 fi
 
 #=================================================
