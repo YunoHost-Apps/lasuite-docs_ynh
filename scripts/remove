@@ -22,7 +22,7 @@ ynh_nodejs_remove
 
 ynh_script_progression "Unregistering minio accesskey"
 access_key=${app//_/-}
-"/var/www/minio/mc" admin accesskey remove minio/ "$access_key"
+sudo -u minio "/var/www/minio/mc" admin accesskey remove minio/ "$access_key"
 
 ynh_config_remove_logrotate
 
