@@ -13,7 +13,7 @@ services = ["__APP__", "__APP__-yprovider"]
         [main.advanced.enable_celery]
         ask.en = "Enable Celery workers"
         ask.fr = "Activer les workers de Celery"
-        help.en = "Employing a Celery worker unlocks some features – like email sending – but it comes at the expense of increased RAM usage."
-        help.fr = "Exploiter les workers de Celery déverrouille quelques fonctionnalités, telles que l'envoi de mails, mais présente l'inconvénient d'augmenter l'utilisation de la RAM."
+        help.en = "This unlocks some features – like email sending – but at the expense of increased RAM usage."
+        help.fr = "Cela déverrouille quelques fonctionnalités, telles que l'envoi de mails, mais au prix d'une consommation de RAM accrue."
         type = "boolean"
         bind = "null"
