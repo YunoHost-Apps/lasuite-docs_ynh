@@ -42,25 +42,25 @@ ynh_script_progression "Creating S3 Bucket"
 s3="${s3:-minio}"
 
 if [[ "${s3}" =~ minio* ]]; then
-  s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
-  s3_password=$(ynh_string_random -l 32)
-  s3_user=$app
+    s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
+    s3_password=$(ynh_string_random -l 32)
+    s3_user=$app
 
-  # FIXME: this script is currently in PR for the MinIO app:
-  # https://github.com/YunoHost-Apps/minio_ynh/pull/77
-  sudo -u minio "./setup_app_bucket.sh" --app="$app" --secret="$s3_password" --with-versioning
+    # FIXME: this script is currently in PR for the MinIO app:
+    # https://github.com/YunoHost-Apps/minio_ynh/pull/77
+    sudo -u minio "./setup_app_bucket.sh" --app="$app" --secret="$s3_password" --with-versioning
 
-  ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
-  ynh_app_setting_set --key="s3_user" --value="$s3_user"
-  ynh_app_setting_set --key="s3_password" --value="$s3_password"
+    ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
+    ynh_app_setting_set --key="s3_user" --value="$s3_user"
+    ynh_app_setting_set --key="s3_password" --value="$s3_password"
 else
-  ynh_die "garage not yet supported"
+    ynh_die "garage not yet supported"
 fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression "Setting up source files..."
+ynh_script_progression "Setting up backend source files..."
 
 ynh_setup_source --dest_dir="$install_dir"
 
@@ -69,46 +69,48 @@ ynh_exec_as_app mkdir -p "$install_dir/_build/frontend"
 ynh_exec_as_app mkdir -p "$install_dir/_build/data/static"
 
 pushd "$install_dir/_build/venv"
-  ynh_exec_as_app python3.11 -m venv .
-  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install "$install_dir/src/backend"
-  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 freeze > requirements.txt
-  ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install -r requirements.txt
+    ynh_exec_as_app python3.11 -m venv .
+    ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install "$install_dir/src/backend"
+    ynh_hide_warnings ynh_exec_as_app ./bin/pip3 freeze > requirements.txt
+    ynh_hide_warnings ynh_exec_as_app ./bin/pip3 install -r requirements.txt
 popd
 
 # Mail builder
 pushd "$install_dir/src/mail"
-  ynh_hide_warnings ynh_exec_as_app yarn install --frozen-lockfile
-  ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn build
+    ynh_hide_warnings ynh_exec_as_app yarn install --frozen-lockfile
+    ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn build
 popd
 
 pushd "$install_dir/src/backend"
-  # Collect the static resources
-  ynh_exec_as_app DATA_DIR="$install_dir/_build/data" DJANGO_CONFIGURATION=Build DJANGO_JWT_PRIVATE_SIGNING_KEY=Dummy \
-    STATIC_ROOT="$install_dir/src/backend" \
-    "$install_dir/_build/venv/bin/python" manage.py collectstatic --noinput
+    # Collect the static resources
+    ynh_exec_as_app DATA_DIR="$install_dir/_build/data" DJANGO_CONFIGURATION=Build DJANGO_JWT_PRIVATE_SIGNING_KEY=Dummy \
+        STATIC_ROOT="$install_dir/src/backend" \
+        "$install_dir/_build/venv/bin/python" manage.py collectstatic --noinput
 
-  # Generate compiled translation messages
-  ynh_exec_as_app DJANGO_CONFIGURATION=Build \
-    "$install_dir/_build/venv/bin/python" manage.py compilemessages
+    # Generate compiled translation messages
+    ynh_exec_as_app DJANGO_CONFIGURATION=Build \
+        "$install_dir/_build/venv/bin/python" manage.py compilemessages
 
-  rdfind -makesymlinks true -followsymlinks true -makeresultsfile false "$install_dir/_build/data/static"
-  # Setup the database
-  ynh_hide_warnings ynh_exec_as_app \
-    DJANGO_CONFIGURATION=Production \
-    DB_NAME=$db_name DB_USER=$db_name DB_PASSWORD=$db_pwd \
-    "$install_dir/_build/venv/bin/python" manage.py migrate
+    rdfind -makesymlinks true -followsymlinks true -makeresultsfile false "$install_dir/_build/data/static"
+    # Setup the database
+    ynh_hide_warnings ynh_exec_as_app \
+        DJANGO_CONFIGURATION=Production \
+        DB_NAME=$db_name DB_USER=$db_name DB_PASSWORD=$db_pwd \
+        "$install_dir/_build/venv/bin/python" manage.py migrate
 
-  # Move templates to where they are expected by impress settings
-  mv ../backend/core/templates "$install_dir/_build/venv/lib/"python3*/"site-packages/"
+    # Move templates to where they are expected by impress settings
+    mv ../backend/core/templates "$install_dir/_build/venv/lib/"python3*/"site-packages/"
 popd
 
+ynh_script_progression "Setting up frontend source files..."
+
 pushd "$install_dir/src/frontend"
-  ynh_hide_warnings ynh_exec_as_app yarn install
-  ynh_hide_warnings ynh_exec_as_app yarn next telemetry disable
-  pushd "./apps/impress"
-    ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn next build --no-lint
-  popd
-  mv ./apps/impress/out "$install_dir/_build/frontend"
+    ynh_hide_warnings ynh_exec_as_app yarn install
+    ynh_hide_warnings ynh_exec_as_app yarn next telemetry disable
+    pushd "./apps/impress"
+        ynh_hide_warnings ynh_exec_as_app NODE_ENV=production yarn next build --no-lint
+    popd
+    mv ./apps/impress/out "$install_dir/_build/frontend"
 popd
 
 chown -R "$app:www-data" "$install_dir"
@@ -116,15 +118,17 @@ chown -R "$app:www-data" "$install_dir"
 #=================================================
 # BUILD YARN DEPENDENCIES YJS
 #=================================================
+ynh_script_progression "Setting up y-provider source files..."
+
 y_provider_api_key=$(ynh_string_random -l 32)
 collaboration_server_secret=$(ynh_string_random -l 32)
 ynh_app_setting_set --key=y_provider_api_key --value=$y_provider_api_key
 ynh_app_setting_set --key=collaboration_server_secret --value=$collaboration_server_secret
 
 pushd "$install_dir/src/frontend/servers/y-provider"
-	ynh_hide_warnings ynh_exec_as_app yarn install --pure-lockfile
-	ynh_hide_warnings ynh_exec_as_app yarn build
-  ynh_hide_warnings ynh_exec_as_app yarn cache clean
+    ynh_hide_warnings ynh_exec_as_app yarn install --pure-lockfile
+    ynh_hide_warnings ynh_exec_as_app yarn build
+    ynh_hide_warnings ynh_exec_as_app yarn cache clean
 popd
 
 #=================================================
@@ -161,6 +165,11 @@ ynh_config_add_systemd --service="${app}-yprovider" --template="systemd-yprovide
 yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
 yunohost service add "$app-yprovider" --description="Yprovider for Docs" --log="/var/log/$app/$app-yprovider.log"
 
+if use_celery; then
+    ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
+    yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+fi
+
 # Use logrotate to manage application logfile(s)
 ynh_config_add_logrotate
 
@@ -172,6 +181,9 @@ ynh_script_progression "Starting $app's systemd service..."
 # Start a systemd service
 ynh_systemctl --service="$app" --action="start"
 ynh_systemctl --service="$app-yprovider" --action="start"
+if use_celery; then
+    ynh_systemctl --service="$app-celery" --action="start"
+fi
 
 #=================================================
 # END OF SCRIPT

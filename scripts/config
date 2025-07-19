@@ -17,45 +17,45 @@ ynh_abort_if_errors
 #=================================================
 
 get__enable_celery() {
-  if use_celery; then
-    echo true;
-  else
-    echo false;
-  fi
+    if use_celery; then
+        echo true;
+    else
+        echo false;
+    fi
 }
 
 set__enable_celery() {
-  if [ "$enable_celery" -eq 0 ]; then
-    systemctl stop "$app-celery"
+    if [ "$enable_celery" -eq 0 ]; then
+        systemctl stop "$app-celery"
 
-    ynh_redis_remove_db "$celery_redis_db"
+        ynh_redis_remove_db "$celery_redis_db"
 
-    if ynh_hide_warnings yunohost service status "$app-celery" >/dev/null; then
-        yunohost service remove "$app-celery"
+        if ynh_hide_warnings yunohost service status "$app-celery" >/dev/null; then
+            yunohost service remove "$app-celery"
+        fi
+        ynh_config_remove_systemd "${app}-celery"
+
+        celery_redis_db=-1
+    else
+        celery_redis_db=$(ynh_redis_get_free_db)
+        celery_broker_url=$(get_celery_broker_url)
+        redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
+        ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
+
+        ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
+        yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
     fi
-    ynh_config_remove_systemd "${app}-celery"
 
-    celery_redis_db=-1
-  else
-    celery_redis_db=$(ynh_redis_get_free_db)
-    celery_broker_url=$(get_celery_broker_url)
-    redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
     ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
 
-    ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
-    yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
-  fi
+    ynh_config_add --template="env" --destination="$install_dir/.env"
+    chmod 400 "$install_dir/.env"
+    chown "$app:$app" "$install_dir/.env"
 
-  ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
-
-  ynh_config_add --template="env" --destination="$install_dir/.env"
-  chmod 400 "$install_dir/.env"
-  chown "$app:$app" "$install_dir/.env"
-
-  if [ "$enable_celery" -eq 1 ]; then
-    ynh_systemctl --service="$app-celery" --action="start"
-  fi
-  # other Docs service will be restarted automatically, as it is specified in the config_panel.toml
+    if [ "$enable_celery" -eq 1 ]; then
+        ynh_systemctl --service="$app-celery" --action="start"
+    fi
+    # other Docs service will be restarted automatically, as it is specified in the config_panel.toml
 }
 
 #=================================================

@@ -14,7 +14,7 @@ ynh_script_progression "Removing system configurations related to $app..."
 
 ynh_redis_remove_db "$redis_db"
 if use_celery; then
-  ynh_redis_remove_db "$celery_redis_db"
+    ynh_redis_remove_db "$celery_redis_db"
 fi
 
 ynh_nodejs_remove
