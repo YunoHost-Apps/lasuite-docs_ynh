@@ -22,7 +22,14 @@ redis_db=$(ynh_redis_get_free_db)
 redis-cli -n "$redis_db" SET __YNH_PROVISIONED "$app"
 django_secret_key=$(ynh_string_random -l 32)
 ynh_app_setting_set --key=redis_db --value=$redis_db
-ynh_app_setting_set --key=celery_redis_db --value=-1
+celery_redis_db=-1
+if [ "$enable_celery" -eq 1 ]; then
+    ynh_print_info "Install $app with celery enabled"
+    celery_redis_db=$(ynh_redis_get_free_db)
+    redis-cli -n "$celery_redis_db" SET __YNH_PROVISIONED "$app"
+fi
+ynh_app_setting_delete --key=enable_celery # celery_redis_db now tells whether celery is enabled or not
+ynh_app_setting_set --key=celery_redis_db --value="$celery_redis_db"
 ynh_app_setting_set --key=django_secret_key --value=$django_secret_key
 celery_broker_url=$(get_celery_broker_url)
 
