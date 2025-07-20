@@ -25,7 +25,7 @@ test_format = 1.0
 
     if [ "$FROM_COMMIT" == "ca64ba5f" ]; then
         echo "🔧 Enabling celery..."
-        sudo yunohost app config set $APP enable_celery -v true
+        sudo yunohost app config set $APP main.advanced.enable_celery -v yes
     fi
     echo "✅ End of preupgrade"
     """
