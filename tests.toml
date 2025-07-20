@@ -21,8 +21,6 @@ test_format = 1.0
 
     preupgrade = """
     set -x
-    APP=docs # FIXME: remove this when this variable is given by the package_check
-
     if [ "$FROM_COMMIT" == "ca64ba5f" ]; then
         echo "🔧 Enabling celery..."
         sudo yunohost app config set $APP main.advanced.enable_celery -v yes
