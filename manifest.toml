@@ -62,15 +62,6 @@ ram.runtime = "50M"
     choices = ["en-us", "fr-fr", "de-de", "nl-nl", "es-es"]
     default = "en-us"
 
-    [install.enable_celery]
-    ask.en = "Do you want to enable celery?"
-    ask.fr = "Voulez-vous activer celery ?"
-    type = "boolean"
-    optional = true
-    help.en = "This unlocks some features – like email sending – but at the expense of increased RAM usage."
-    help.fr = "Cela déverrouille quelques fonctionnalités, telles que l'envoi de mails, mais au prix d'une consommation de RAM accrue."
-
-
 [resources]
     [resources.sources]
 

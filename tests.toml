@@ -25,28 +25,3 @@ test_format = 1.0
 
     args.dex = "dex"
     args.s3 = "minio"
-
-[with_celery]
-    # ------------
-    # Tests to run
-    # ------------
-
-    preinstall = """
-    set -x
-    sudo yunohost tools update apps
-    sudo yunohost domain add dex.domain.tld
-    sudo yunohost app install dex -f -a "domain=dex.domain.tld&path=/&oidc_name=&oidc_secret=&oidc_callback"
-
-    sudo yunohost domain add minio.domain.tld
-    sudo yunohost app install minio -f -a "domain=minio.domain.tld&init_main_permission=visitors&admin=package_checker&password=minio_password1234"
-
-    echo "✅ End of preinstall"
-    """
-
-    # -------------------------------
-    # Default args to use for install
-    # -------------------------------
-
-    args.dex = "dex"
-    args.s3 = "minio"
-    args.enable_celery=1
