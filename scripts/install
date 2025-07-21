@@ -163,7 +163,7 @@ ynh_config_add_systemd
 ynh_config_add_systemd --service="${app}-yprovider" --template="systemd-yprovider.service"
 
 yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
-yunohost service add "$app-yprovider" --description="Yprovider for Docs" --log="/var/log/$app/$app-yprovider.log"
+yunohost service add "$app-yprovider" --description="Yprovider for Docs (La Suite)" --log="/var/log/$app/$app-yprovider.log"
 
 # Use logrotate to manage application logfile(s)
 ynh_config_add_logrotate

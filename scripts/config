@@ -44,7 +44,7 @@ set__enable_celery() {
         ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db
 
         ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
-        yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+        yunohost service add "$app-celery" --description="Celery for Docs (La Suite)" --log="/var/log/$app/$app-celery.log"
     fi
 
     ynh_app_setting_set --key=celery_redis_db --value=$celery_redis_db

@@ -152,11 +152,11 @@ ynh_config_add_systemd
 ynh_config_add_systemd --service="${app}-yprovider" --template="systemd-yprovider.service"
 
 yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
-yunohost service add "$app-yprovider" --description="Yprovider for Docs" --log="/var/log/$app/$app-yprovider.log"
+yunohost service add "$app-yprovider" --description="Yprovider for Docs (La Suite)" --log="/var/log/$app/$app-yprovider.log"
 
 if use_celery; then
     ynh_config_add_systemd --service="${app}-celery" --template="systemd-celery.service"
-    yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+    yunohost service add "$app-celery" --description="Celery for Docs (La Suite)" --log="/var/log/$app/$app-celery.log"
 fi
 
 # Use logrotate to manage application logfile(s)

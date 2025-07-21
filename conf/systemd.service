@@ -1,5 +1,5 @@
 [Unit]
-Description=Docs backend service
+Description=Docs (La Suite) backend service
 After=network.target
 
 [Service]

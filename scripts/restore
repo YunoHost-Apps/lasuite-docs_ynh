@@ -71,12 +71,12 @@ yunohost service add "$app" --description="Simple collaborative notetaking" --lo
 
 ynh_restore "/etc/systemd/system/$app-yprovider.service"
 systemctl enable "$app-yprovider.service" --quiet
-yunohost service add "$app-yprovider" --description="Yprovider for Docs" --log="/var/log/$app/$app-yprovider.log"
+yunohost service add "$app-yprovider" --description="Yprovider for Docs (La Suite)" --log="/var/log/$app/$app-yprovider.log"
 
 if use_celery; then
     ynh_restore "/etc/systemd/system/$app-celery.service"
     systemctl enable "$app-celery.service" --quiet
-    yunohost service add "$app-celery" --description="Celery for Docs" --log="/var/log/$app/$app-celery.log"
+    yunohost service add "$app-celery" --description="Celery for Docs (La Suite)" --log="/var/log/$app/$app-celery.log"
 fi
 
 ynh_restore "/etc/logrotate.d/$app"

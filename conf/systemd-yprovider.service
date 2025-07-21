@@ -1,5 +1,5 @@
 [Unit]
-Description=Docs Y-provider service
+Description=Docs (La Suite) Y-provider service
 After=network.target
 
 [Service]
