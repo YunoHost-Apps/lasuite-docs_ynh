@@ -4,36 +4,36 @@ It shall NOT be edited by hand.
 -->
 
 <h1>
-  <img src="https://raw.githubusercontent.com/YunoHost/apps/main/logos/docs.png" width="32px" alt="Logo of Docs">
-  Docs, packaged for YunoHost
+  <img src="https://raw.githubusercontent.com/YunoHost/apps/main/logos/lasuite-docs.png" width="32px" alt="Logo of Docs (La Suite)">
+  Docs (La Suite), packaged for YunoHost
 </h1>
 
 Collaborate and write in real time, with no layout constraints
 
 [![🌐 Official app website](https://img.shields.io/badge/Official_app_website-darkgreen?style=for-the-badge)](https://docs.numerique.gouv.fr)
 [![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)](https://docs.numerique.gouv.fr)
-[![Version: 3.4.0~ynh1](https://img.shields.io/badge/Version-3.4.0~ynh1-rgba(0,150,0,1)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/docs/)
+[![Version: 3.4.0~ynh2](https://img.shields.io/badge/Version-3.4.0~ynh2-rgba(0,150,0,1)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/lasuite-docs/)
 
 <div align="center">
-<a href="https://apps.yunohost.org/app/docs"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
-<a href="https://github.com/YunoHost-Apps/docs_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
+<a href="https://apps.yunohost.org/app/lasuite-docs"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
+<a href="https://github.com/YunoHost-Apps/lasuite-docs_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
 </div>
 
 ## 📦 Developer info
 
-[![Automatic tests level](https://apps.yunohost.org/badge/cilevel/docs)](https://ci-apps.yunohost.org/ci/apps/docs/)
+[![Automatic tests level](https://apps.yunohost.org/badge/cilevel/lasuite-docs)](https://ci-apps.yunohost.org/ci/apps/lasuite-docs/)
 
-🛠️ Upstream Docs repository: <https://github.com/suitenumerique/docs/>
+🛠️ Upstream Docs (La Suite) repository: <https://github.com/suitenumerique/docs/>
 
-Pull request are welcome and should target the [`testing` branch](https://github.com/YunoHost-Apps/docs_ynh/tree/testing).
+Pull request are welcome and should target the [`testing` branch](https://github.com/YunoHost-Apps/lasuite-docs_ynh/tree/testing).
 
 The `testing` branch can be tested using:
 ```
 # fresh install:
-sudo yunohost app install https://github.com/YunoHost-Apps/docs_ynh/tree/testing
+sudo yunohost app install https://github.com/YunoHost-Apps/lasuite-docs_ynh/tree/testing
 
 # upgrade an existing install:
-sudo yunohost app upgrade docs -u https://github.com/YunoHost-Apps/docs_ynh/tree/testing
+sudo yunohost app upgrade lasuite-docs -u https://github.com/YunoHost-Apps/lasuite-docs_ynh/tree/testing
 ```
 
 ### 📚 App packaging documentation
