@@ -2,8 +2,8 @@
 
 packaging_format = 2
 
-id = "docs"
-name = "Docs"
+id = "lasuite-docs"
+name = "La Suite - Docs"
 description.en = "Collaborate and write in real time, with no layout constraints"
 description.fr = "Collaborer et écrire en temps réel, sans contrainte de mise en page"
 

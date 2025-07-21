@@ -1,5 +1,5 @@
 [Unit]
-Description=Docs Celery service
+Description=Docs (La Suite) Celery service
 After=network.target redis.service postgresql.service
 
 [Service]
