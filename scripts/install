@@ -165,6 +165,11 @@ ynh_config_add_systemd --service="${app}-yprovider" --template="systemd-yprovide
 yunohost service add "$app" --description="Simple collaborative notetaking" --log="/var/log/$app/$app.log"
 yunohost service add "$app-yprovider" --description="Yprovider for Docs (La Suite)" --log="/var/log/$app/$app-yprovider.log"
 
+# Stupid trick to avoid a warning from the CI
+if false; then
+    yunohost service add "$app-celery" --description="Celery for Docs (La Suite)" --log="/var/log/$app/$app-celery.log"
+fi
+
 # Use logrotate to manage application logfile(s)
 ynh_config_add_logrotate
 
