@@ -37,6 +37,7 @@ set__enable_celery() {
         ynh_config_remove_systemd "${app}-celery"
 
         celery_redis_db=-1
+        celery_broker_url=$(get_celery_broker_url)
     else
         celery_redis_db=$(ynh_redis_get_free_db)
         celery_broker_url=$(get_celery_broker_url)
