@@ -19,7 +19,7 @@ test_format = 1.0
     """
 
     preupgrade = """
-    if [ "$FROM_COMMIT" == "ac288af0" ]; then
+    if [ "$FROM_COMMIT" == "5d1c5af" ]; then
         echo "🔧 Enabling celery..."
         sudo yunohost app config set $APP main.advanced.enable_celery -v yes
     fi
@@ -37,4 +37,4 @@ test_format = 1.0
     # Commits to test upgrade from
     # -------------------------------
 
-    test_upgrade_from.ac288af0.name = "Upgrade from 3.4.0~ynh2"
+    test_upgrade_from.5d1c5af.name = "Upgrade from 3.4.0~ynh2"
