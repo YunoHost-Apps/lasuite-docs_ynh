@@ -12,7 +12,9 @@ version = "3.4.2~ynh1"
 maintainers = ["fflorent", "Ddataa", "mjeammet"]
 
 [upstream]
-license = "MIT"
+# By default, the upstream licence is AGPL. See the documentation about NEXT_PUBLIC_PUBLISH_AS_MIT (an env variable that we don't use during the build):
+# https://github.com/suitenumerique/docs/blob/main/docs/env.md#impress-frontend-image
+license = "AGPL-3.0-or-later"
 website = "https://docs.numerique.gouv.fr"
 demo = "https://docs.numerique.gouv.fr"
 code = "https://github.com/suitenumerique/docs/"
