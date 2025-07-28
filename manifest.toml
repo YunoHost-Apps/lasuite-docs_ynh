@@ -9,7 +9,7 @@ description.fr = "Collaborer et écrire en temps réel, sans contrainte de mise 
 
 version = "3.4.2~ynh1"
 
-maintainers = ["fflorent", "Ddataa", "mjeammet", "Flightan"]
+maintainers = ["fflorent", "Ddataa", "mjeammet"]
 
 [upstream]
 license = "MIT"
