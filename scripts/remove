@@ -17,7 +17,7 @@ if use_celery; then
     ynh_redis_remove_db "$celery_redis_db"
 fi
 
-ynh_nodejs_remove
+#REMOVEME? ynh_nodejs_remove
 
 ynh_script_progression "Unregistering minio accesskey"
 access_key=${app//_/-}

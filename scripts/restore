@@ -15,7 +15,7 @@ celery_broker_url=$(get_celery_broker_url)
 #=================================================
 ynh_script_progression "Reinstalling dependencies..."
 
-ynh_nodejs_install
+#REMOVEME? ynh_nodejs_install
 
 #=================================================
 # RESTORE THE APP MAIN DIR
