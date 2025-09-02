@@ -32,7 +32,7 @@ celery_broker_url=$(get_celery_broker_url)
 
 ynh_script_progression "Installing dependencies..."
 
-ynh_nodejs_install
+#REMOVEME? ynh_nodejs_install
 
 #=================================================
 # APP INITIAL CONFIGURATION

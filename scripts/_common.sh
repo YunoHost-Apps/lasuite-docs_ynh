@@ -7,7 +7,7 @@
 #=================================================
 # COMMON VARIABLES AND CUSTOM HELPERS
 #=================================================
-nodejs_version=22
+#REMOVEME? nodejs_version=22
 
 python_version="3.12"
 
