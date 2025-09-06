@@ -7,9 +7,6 @@
 #=================================================
 # COMMON VARIABLES AND CUSTOM HELPERS
 #=================================================
-#REMOVEME? nodejs_version=22
-
-python_version="3.12"
 
 setup_dex() {
     # List the Dex apps installed on the system

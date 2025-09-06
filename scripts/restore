@@ -11,13 +11,6 @@ source /usr/share/yunohost/helpers
 celery_broker_url=$(get_celery_broker_url)
 
 #=================================================
-# INSTALL NODEJS
-#=================================================
-ynh_script_progression "Reinstalling dependencies..."
-
-#REMOVEME? ynh_nodejs_install
-
-#=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
 ynh_script_progression "Restoring the app main directory..."
