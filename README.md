@@ -14,6 +14,7 @@ Collaborate and write in real time, with no layout constraints
 [![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)](https://docs.numerique.gouv.fr)
 [![Version: 3.6.0~ynh1](https://img.shields.io/badge/Version-3.6.0~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/lasuite-docs/)
 
+
 <div align="center">
 <a href="https://apps.yunohost.org/app/lasuite-docs"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
 <a href="https://github.com/YunoHost-Apps/lasuite-docs_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
