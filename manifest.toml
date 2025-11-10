@@ -7,7 +7,7 @@ name = "La Suite - Docs"
 description.en = "Collaborate and write in real time, with no layout constraints"
 description.fr = "Collaborer et écrire en temps réel, sans contrainte de mise en page"
 
-version = "3.8.2~ynh1"
+version = "3.9.0~ynh1"
 
 maintainers = ["fflorent", "Ddataa", "mjeammet"]
 
@@ -68,8 +68,8 @@ ram.runtime = "500M"
     [resources.sources]
 
     [resources.sources.main]
-    url = "https://github.com/suitenumerique/docs/archive/refs/tags/v3.8.2.tar.gz"
-    sha256 = "aac95f6cebfc8187f2fe589ef8687d7e2ff53445051e8fcc1fda1859ffce3024"
+    url = "https://github.com/suitenumerique/docs/archive/refs/tags/v3.9.0.tar.gz"
+    sha256 = "c8f7a633dbf7e10582feeebfa3aba3a4b8b3a03ecd8f3beafbd09ea87288123e"
     autoupdate.strategy = "latest_github_tag"
 
     [resources.system_user]
