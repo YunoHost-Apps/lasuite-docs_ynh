@@ -87,7 +87,7 @@ pushd "$install_dir/src/backend"
     # Setup the database
     ynh_hide_warnings ynh_exec_as_app \
         DJANGO_CONFIGURATION=Production \
-        DB_NAME=$db_name DB_USER=$db_name DB_PASSWORD=$db_pwd \
+        DB_NAME=$db_name DB_USER=postgres DB_PASSWORD="$(cat $PSQL_ROOT_PWD_FILE)" \
         "$install_dir/_build/venv/bin/python" manage.py migrate
 
     # Move templates to where they are expected by impress settings
