@@ -91,11 +91,13 @@ pushd "$install_dir/src/backend"
         "$install_dir/_build/venv/bin/python" manage.py compilemessages
 
     rdfind -makesymlinks true -followsymlinks true -makeresultsfile false "$install_dir/_build/data/static"
+    ynh_psql_db_shell <<< "ALTER USER $db_name WITH SUPERUSER;"
     # Setup the database
     ynh_hide_warnings ynh_exec_as_app \
         DJANGO_CONFIGURATION=Production \
-        DB_NAME=$db_name DB_USER=postgres DB_PASSWORD="$(cat $PSQL_ROOT_PWD_FILE)" \
+        DB_NAME=$db_name DB_USER=$db_name DB_PASSWORD=$db_pwd \
         "$install_dir/_build/venv/bin/python" manage.py migrate
+    ynh_psql_db_shell <<< "ALTER USER $db_name WITH NOSUPERUSER;"
 
     # Move templates to where they are expected by impress settings
     mv ../backend/core/templates "$install_dir/_build/venv/lib/"python3*/"site-packages/"
