@@ -87,12 +87,13 @@ pushd "$install_dir/src/backend"
     # Setup the database
     ynh_psql_db_shell <<< "CREATE ROLE tmp_su_docs WITH SUPERUSER NOINHERIT; GRANT tmp_su_docs TO postgres;"
     ynh_psql_db_shell <<< "set role tmp_su_docs"
-    ynh_psql_db_shell <<< "GRANT USAGE ON LANGUAGE C TO $db_name;"
+    ynh_psql_db_shell <<< "ALTER USER $db_name WITH SUPERUSER;"
     ynh_hide_warnings ynh_exec_as_app \
         DJANGO_CONFIGURATION=Production \
         DB_NAME=$db_name DB_USER=$db_name DB_PASSWORD=$db_pwd \
         "$install_dir/_build/venv/bin/python" manage.py migrate
     ynh_psql_db_shell <<< "DROP ROLE tmp_su_docs;"
+    ynh_psql_db_shell <<< "ALTER USER $db_name WITH NOSUPERUSER;"
 
     # Move templates to where they are expected by impress settings
     mv ../backend/core/templates "$install_dir/_build/venv/lib/"python3*/"site-packages/"
