@@ -1,5 +1,5 @@
 diff --git a/src/backend/pyproject.toml b/src/backend/pyproject.toml
-index 509e75a3..ec432b99 100644
+index 10f1639..cada7fa 100644
 --- a/src/backend/pyproject.toml
 +++ b/src/backend/pyproject.toml
 @@ -17,13 +17,13 @@ classifiers = [
@@ -9,12 +9,13 @@ index 509e75a3..ec432b99 100644
 -    "Programming Language :: Python :: 3.12",
 +    "Programming Language :: Python :: 3.11",
  ]
- description = "An application to print markdown to pdf from a set of managed templates."
+ description = "Docs is a collaborative text editor designed to address common challenges in knowledge building and sharing."
  keywords = ["Django", "Contacts", "Templates", "RBAC"]
  license = { file = "LICENSE" }
  readme = "README.md"
 -requires-python = ">=3.12"
 +requires-python = ">=3.11"
  dependencies = [
-     "beautifulsoup4==4.13.4",
-     "boto3==1.38.27",
+     "beautifulsoup4==4.14.3",
+     "boto3==1.42.17",
+     
