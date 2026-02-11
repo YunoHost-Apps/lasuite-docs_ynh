@@ -44,8 +44,8 @@ ram.runtime = "500M"
 
     [install.s3]
     type = "app"
-    filter = "match(id, '^(minio|garage)(__[0-9+])?$')"
-    ask.en = "Select the S3 app (Garage or Minio) that will handle storage."
+    filter = "match(id, '^(minio|garage|seaweedfs)(__[0-9+])?$')"
+    ask.en = "Select the S3 app (Garage, Minio or SeaweedFS) that will handle storage."
     ask.fr = "Sélectionnez l'app S3 (Garage ou Minio) qui gérera le stockage."
     help.en = "You need to have at least one instance of Garage or Minio installed beforehand on your server."
     help.fr = "Vous devez avoir au moins une instance de Garage ou Minio préalablement installée sur votre serveur."
