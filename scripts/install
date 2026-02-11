@@ -27,29 +27,6 @@ ynh_app_setting_set --key=django_secret_key --value=$django_secret_key
 celery_broker_url=$(get_celery_broker_url)
 
 #=================================================
-# APP INITIAL CONFIGURATION
-#=================================================
-ynh_script_progression "Creating S3 Bucket"
-
-s3="${s3:-minio}"
-
-if [[ "${s3}" =~ minio* ]]; then
-    s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
-    s3_password=$(ynh_string_random -l 32)
-    s3_user=$app
-
-    # FIXME: this script is currently in PR for the MinIO app:
-    # https://github.com/YunoHost-Apps/minio_ynh/pull/77
-    sudo -u minio "./setup_app_bucket.sh" --app="$app" --secret="$s3_password" --with-versioning
-
-    ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
-    ynh_app_setting_set --key="s3_user" --value="$s3_user"
-    ynh_app_setting_set --key="s3_password" --value="$s3_password"
-else
-    ynh_die "garage not yet supported"
-fi
-
-#=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 ynh_script_progression "Installing dependencies..."
