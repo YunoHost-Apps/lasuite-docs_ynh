@@ -52,11 +52,11 @@ ram.runtime = "500M"
     [install.s3.domain]
     type = "url"
     [install.s3.user]
-    type = "string"
+
     [install.s3.password]
-    type = "string"
+    type = "password"
     [install.s3.bucket]
-    type = "string"
+
 
     [install.domain]
     type = "domain"
