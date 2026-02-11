@@ -42,10 +42,7 @@ ram.runtime = "500M"
     help.en = "You need to have at least one instance of Dex installed beforehand on your server."
     help.fr = "Vous devez avoir au moins une instance de Dex préalablement installée sur votre serveur."
 
-    [install.s3]
 
-    help.en = "You need to have at least one instance of Garage or Minio installed beforehand on your server."
-    help.fr = "Vous devez avoir au moins une instance de Garage ou Minio préalablement installée sur votre serveur."
         [install.s3_domain]
         type = "url"
         ask.en = "S3 Endpoint"
