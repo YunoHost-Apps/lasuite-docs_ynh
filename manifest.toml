@@ -44,7 +44,7 @@ ram.runtime = "500M"
 
 
         [install.s3_domain]
-        type = "url"
+        type = "string"
         ask.en = "S3 Endpoint"
         ask.fr = "S3 Endpoint"
         [install.s3_user]
