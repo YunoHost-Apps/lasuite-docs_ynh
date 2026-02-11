@@ -51,12 +51,21 @@ ram.runtime = "500M"
     help.fr = "Vous devez avoir au moins une instance de Garage ou Minio préalablement installée sur votre serveur."
     [install.s3.domain]
     type = "url"
+    ask.en = "S3 Endpoint"
+    ask.fr = "S3 Endpoint"
     [install.s3.user]
+    type = "string"
+    ask.en = "S3 Key"
+    ask.fr = "S3 Key"
 
     [install.s3.password]
     type = "password"
+    ask.en = "S3 Secret"
+    ask.fr = "S3 Secret"
     [install.s3.bucket]
-
+    type = "string"
+    ask.en = "Bucket Name"
+    ask.fr = "Bucket Name"
 
     [install.domain]
     type = "domain"
