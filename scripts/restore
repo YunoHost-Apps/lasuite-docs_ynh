@@ -81,6 +81,26 @@ ynh_restore "/etc/logrotate.d/$app"
 ynh_restore "/var/log/$app/"
 
 #=================================================
+# CONFIGURE MINIO
+#=================================================
+
+if [[ "${s3}" =~ minio* ]]; then
+  # FIXME: this script is currently in PR for the MinIO app:
+  # https://github.com/YunoHost-Apps/minio_ynh/pull/77
+  #
+  # Also as we are in the context of the restoration script, the "minio" user does not have access
+  # to the folders like ../settings.
+  # The funky workaround consist in copying the script in the temporary directory.
+
+  tmp_script_path=$(mktemp)
+  install -o minio -m 0700 "../settings/scripts/setup_app_bucket.sh" $tmp_script_path
+  sudo -u minio bash "$tmp_script_path" --app="$app" --secret="$s3_password" --with-versioning
+  ynh_safe_rm "$tmp_script_path"
+else
+  ynh_die "garage not yet supported"
+fi
+
+#=================================================
 # SETUP DEX FOR OIDC
 #=================================================
 setup_dex
