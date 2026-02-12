@@ -45,6 +45,14 @@ if [[ "${s3}" =~ minio* ]]; then
     ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
     ynh_app_setting_set --key="s3_user" --value="$s3_user"
     ynh_app_setting_set --key="s3_password" --value="$s3_password"
+elif [[ "${s3}" =~ seaweedfs* ]]; then
+    s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
+    s3_password=$(ynh_string_random -l 32)
+    s3_user=$app
+
+    ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
+    ynh_app_setting_set --key="s3_user" --value="$s3_user"
+    ynh_app_setting_set --key="s3_password" --value="$s3_password"
 else
     ynh_die "garage not yet supported"
 fi
