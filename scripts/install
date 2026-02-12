@@ -49,7 +49,8 @@ elif [[ "${s3}" =~ seaweedfs* ]]; then
     s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
     s3_password=$(ynh_string_random -l 32)
     s3_user=$app
-    
+    MASTER="localhost:9333"
+
     yunohost app shell seaweedfs -c "
     weed shell -master=$MASTER <<EOF
     s3.configure -access_key=$app -secret_key=$s3_password -buckets=$app -user=$app -actions=Read,Write,List,Tagging -apply
