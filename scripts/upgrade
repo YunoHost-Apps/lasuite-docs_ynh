@@ -32,7 +32,15 @@ setup_dex
 
 ynh_script_progression "Updating S3 Bucket"
 
+s3="${s3:-minio}"
 
+if [[ "${s3}" =~ minio* ]]; then
+    # FIXME: this script is currently in PR for the MinIO app:
+    # https://github.com/YunoHost-Apps/minio_ynh/pull/77
+    sudo -u minio "./setup_app_bucket.sh" --app="$app" --secret="$s3_password" --with-versioning
+else
+    ynh_die "garage not yet supported"
+fi
 
 #=================================================
 # INSTALL DEPENDENCIES
