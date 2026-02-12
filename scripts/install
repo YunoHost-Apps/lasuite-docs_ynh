@@ -51,13 +51,13 @@ elif [[ "${s3}" =~ seaweedfs* ]]; then
     s3_user=$app
 
     yunohost app shell seaweedfs <<EOF
-    weed shell <<INNER
+    ./weed shell <<INNER
     s3.configure -access_key=$app -secret_key=$s3_password -buckets=$app -user=$app -actions=Read,Write,List,Tagging -apply
 INNER
 EOF
 
     yunohost app shell seaweedfs <<EOF
-    weed shell <<INNER
+    ./weed shell <<INNER
     s3.bucket.create -name $app -owner $app -withLock
 INNER
 EOF
