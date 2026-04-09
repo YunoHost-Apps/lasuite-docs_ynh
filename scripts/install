@@ -31,7 +31,7 @@ celery_broker_url=$(get_celery_broker_url)
 #=================================================
 ynh_script_progression "Creating S3 Bucket"
 
-s3="${s3:-minio}"
+#s3="${s3:-minio}"
 
 if [[ "${s3}" =~ minio* ]]; then
     s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
@@ -45,7 +45,47 @@ if [[ "${s3}" =~ minio* ]]; then
     ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
     ynh_app_setting_set --key="s3_user" --value="$s3_user"
     ynh_app_setting_set --key="s3_password" --value="$s3_password"
+elif [[ "${s3}" =~ seaweedfs* ]]; then
+    s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
+    s3_password=$(ynh_string_random -l 32)
+    s3_user=$app
+
+    yunohost app shell seaweedfs <<EOF
+    ./weed shell <<INNER
+    s3.configure -access_key=$app -secret_key=$s3_password -buckets=$app -user=$app -actions=Read,Write,List,Tagging -apply
+INNER
+EOF
+
+    yunohost app shell seaweedfs <<EOF
+    ./weed shell <<INNER
+    s3.bucket.create -name $app -owner $app -withLock
+INNER
+EOF
+
+    ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
+    ynh_app_setting_set --key="s3_user" --value="$s3_user"
+    ynh_app_setting_set --key="s3_password" --value="$s3_password"
+
+elif [[ "${s3}" =~ versitygw* ]]; then
+    s3_domain=$(ynh_app_setting_get --app="$s3" --key=domain)
+    s3_password=$(ynh_string_random -l 32)
+    s3_user=$app
+    vgw_admin=$(ynh_app_setting_get --app=versitygw --key=admin_key)
+    vgw_admin_secret=$(ynh_app_setting_get --app=versitygw --key=admin_secret)
+    vgw_port=$(ynh_app_setting_get --app=versitygw --key=port)
+
+    yunohost app shell versitygw <<EOF
+./versitygw admin -a $vgw_admin -s $vgw_admin_secret --er http://localhost:$vgw_port create-user -a $s3_user -s $s3_password -r user
+./versitygw admin -a $vgw_admin -s $vgw_admin_secret --er http://localhost:$vgw_port create-bucket -o $s3_user --bucket $app --grant-full-control $s3_user \
+--object-ownership BucketOwnerPreferred \
+-object-lock-enabled-for-bucket true
+EOF
+    ynh_app_setting_set --key="s3_domain" --value="$s3_domain"
+    ynh_app_setting_set --key="s3_user" --value="$s3_user"
+    ynh_app_setting_set --key="s3_password" --value="$s3_password"
+
 else
+
     ynh_die "garage not yet supported"
 fi
 

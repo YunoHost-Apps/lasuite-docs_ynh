@@ -96,6 +96,11 @@ if [[ "${s3}" =~ minio* ]]; then
   install -o minio -m 0700 "../settings/scripts/setup_app_bucket.sh" $tmp_script_path
   sudo -u minio bash "$tmp_script_path" --app="$app" --secret="$s3_password" --with-versioning
   ynh_safe_rm "$tmp_script_path"
+
+elif [[ "${s3}" =~ ^seaweedfs ]]; then
+    echo "seawwedfs"
+elif [[ "${s3}" =~ ^versitygw ]]; then
+    echo "versitygw"
 else
   ynh_die "garage not yet supported"
 fi
