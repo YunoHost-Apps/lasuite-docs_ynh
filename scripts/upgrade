@@ -42,6 +42,8 @@ else
     ynh_die "garage not yet supported"
 fi
 
+ynh_app_setting_set_default --key="s3_local_port" --value="$(ynh_app_setting_get --app="$s3" --key=port)"
+
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
