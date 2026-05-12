@@ -13,7 +13,7 @@ index 10f1639..cada7fa 100644
  keywords = ["Django", "Contacts", "Templates", "RBAC"]
  license = { file = "LICENSE" }
  readme = "README.md"
--requires-python = ">=3.12"
+-requires-python = "~=3.13"
 +requires-python = ">=3.11"
  dependencies = [
      "beautifulsoup4==4.14.3",
